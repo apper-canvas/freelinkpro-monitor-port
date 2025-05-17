@@ -399,6 +399,7 @@ const MainFeature = ({ clients, setClients }) => {
                             </button>
                           </div>
                         </div>
+                      )}
                     </div>
                   </td>
                 </tr>
