@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { clients as mockClients, tasks as mockTasks, invoices as mockInvoices } from '../utils/mockData';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
@@ -8,39 +9,17 @@ import MainFeature from '../components/MainFeature';
 const Home = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   
-  // Mock client data
-  const [clients, setClients] = useState([
-    {
-      id: '1',
-      name: 'Eliza Rodriguez',
-      company: 'Innovate Design Co.',
-      email: 'eliza@innovatedesign.com',
-      phone: '(555) 123-4567',
-      status: 'active',
-      tags: ['Design', 'Branding'],
-      lastContact: '2023-11-15'
-    },
-    {
-      id: '2',
-      name: 'Marcus Chen',
-      company: 'TechFlow Solutions',
-      email: 'mchen@techflow.io',
-      phone: '(555) 987-6543',
-      status: 'pending',
-      tags: ['Development', 'Web'],
-      lastContact: '2023-12-02'
-    },
-    {
-      id: '3',
-      name: 'Sophia Williams',
-      company: 'ClearView Marketing',
-      email: 'sophia@clearview.com',
-      phone: '(555) 222-3333',
-      status: 'inactive',
-      tags: ['Marketing', 'Strategy'],
-      lastContact: '2023-10-20'
-    }
-  ]);
+  // Use mock data for clients
+  const [clients, setClients] = useState(mockClients);
+  
+  // Calculate dashboard metrics
+  const activeClientsCount = mockClients.filter(c => c.status === 'active').length;
+  const totalClientsCount = mockClients.length;
+  
+  const tasksDueCount = mockTasks.filter(task => !task.completed && task.dueDate).length;
+  const tasksThisWeekCount = mockTasks.filter(task => !task.completed && isTaskDueThisWeek(task.dueDate)).length;
+  
+  const pendingInvoicesAmount = calculatePendingInvoicesAmount();
 
 
   // Getting icons
@@ -51,6 +30,36 @@ const Home = () => {
   const FileTextIcon = getIcon('FileText');
   const CalendarIcon = getIcon('Calendar');
   const TimerIcon = getIcon('Timer');
+
+  // Helper function to check if a task is due this week
+  function isTaskDueThisWeek(dateString) {
+    if (!dateString) return false;
+    
+    const today = new Date();
+    const dueDate = new Date(dateString);
+    
+    // Get the start of the current week (Sunday)
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Get the end of the current week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    return dueDate >= startOfWeek && dueDate <= endOfWeek;
+  }
+  
+  // Calculate total pending and overdue invoice amounts
+  function calculatePendingInvoicesAmount() {
+    return mockInvoices
+      .filter(invoice => invoice.status === 'pending' || invoice.status === 'overdue')
+      .reduce((total, invoice) => total + invoice.total, 0);
+  }
+  
+  // Count of pending/overdue invoices
+  const pendingInvoicesCount = mockInvoices.filter(invoice => invoice.status === 'pending' || invoice.status === 'overdue').length;
 
   return (
     <div className="space-y-6">
@@ -78,9 +87,9 @@ const Home = () => {
               <UsersIcon className="w-5 h-5 text-primary" />
             </div>
           </div>
-          <p className="text-3xl font-bold">{clients.filter(c => c.status === 'active').length}</p>
+          <p className="text-3xl font-bold">{activeClientsCount}</p>
           <p className="text-surface-500 dark:text-surface-400 text-sm mt-1">
-            From {clients.length} total clients
+            From {totalClientsCount} total clients
           </p>
         </motion.div>
 
@@ -96,9 +105,9 @@ const Home = () => {
               <CalendarIcon className="w-5 h-5 text-secondary" />
             </div>
           </div>
-          <p className="text-3xl font-bold">7</p>
+          <p className="text-3xl font-bold">{tasksDueCount}</p>
           <p className="text-surface-500 dark:text-surface-400 text-sm mt-1">
-            3 upcoming this week
+            {tasksThisWeekCount} upcoming this week
           </p>
         </motion.div>
 
@@ -114,9 +123,9 @@ const Home = () => {
               <FileTextIcon className="w-5 h-5 text-accent" />
             </div>
           </div>
-          <p className="text-3xl font-bold">$2,450</p>
+          <p className="text-3xl font-bold">${pendingInvoicesAmount.toLocaleString()}</p>
           <p className="text-surface-500 dark:text-surface-400 text-sm mt-1">
-            2 invoices pending payment
+            {pendingInvoicesCount} invoice{pendingInvoicesCount !== 1 ? 's' : ''} pending payment
           </p>
         </motion.div>
       </div>
