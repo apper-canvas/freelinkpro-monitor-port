@@ -286,7 +286,7 @@ const Home = () => {
           <div className="mt-4">
             <Link to="/projects" className="flex items-center p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700">
               <div className="bg-secondary/10 p-2 rounded-lg">
-                {getIcon('Timer', 'w-5 h-5 text-secondary')}
+                {getIcon('Timer')('w-5 h-5 text-secondary')}
               </div>
               <div className="ml-2">Time Tracking</div>
             </Link>
