@@ -145,7 +145,7 @@ const MainFeature = ({ clients, setClients }) => {
   };
 
   // Handle form submission with service integration
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
