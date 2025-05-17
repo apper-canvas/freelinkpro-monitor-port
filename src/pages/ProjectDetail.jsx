@@ -184,13 +184,18 @@ const ProjectDetail = () => {
     const duration = (endTime - startTimeRef.current) / (1000 * 60 * 60);
     const roundedDuration = Math.round(duration * 100) / 100;
     
+    // Format times to HH:MM
+    const formatTimeValue = (date) => {
+      return date.toTimeString().substring(0, 5);
+    };
+    
     const timeEntry = {
       id: `time-${Date.now()}`,
       date: activeTimer.date,
-      startTime: startTimeRef.current.toTimeString().substring(0, 5),
-      endTime: endTime.toTimeString().substring(0, 5),
+      startTime: formatTimeValue(startTimeRef.current),
+      endTime: formatTimeValue(endTime),
       duration: roundedDuration,
-      description: '',
+      description: `Work on ${project.name}`,
       createdAt: new Date().toISOString()
     };
     
