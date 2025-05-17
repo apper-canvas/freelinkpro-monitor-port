@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
@@ -270,18 +271,18 @@ const Home = () => {
       )}
       
       {activeTab === 'projects' && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <ChartIcon className="w-16 h-16 text-surface-300 dark:text-surface-600 mb-4" />
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <ChartIcon className="w-12 h-12 text-primary mb-4" />
           <h3 className="text-xl font-medium text-surface-800 dark:text-surface-200 mb-2">
             Project Management
           </h3>
           <p className="text-surface-500 dark:text-surface-400 max-w-md">
-            Track your projects, milestones, and deliverables in this section.
-            This feature will be available in the next update.
+            Track your projects, manage tasks, set milestones, and monitor progress
+            all in one place.
           </p>
-          <button className="btn-outline mt-6">
-            Coming Soon
-          </button>
+          <Link to="/projects" className="btn-primary mt-6">
+            Go to Projects
+          </Link>
         </div>
       )}
       

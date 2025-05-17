@@ -4,6 +4,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
+import ProjectList from './pages/ProjectList';
+import ProjectDetail from './pages/ProjectDetail';
+import ProjectForm from './pages/ProjectForm';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -72,6 +75,10 @@ function App() {
       <main className="container mx-auto px-4 py-6">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/projects" element={<ProjectList />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/projects/new" element={<ProjectForm />} />
+          <Route path="/projects/edit/:id" element={<ProjectForm />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
