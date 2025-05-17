@@ -9,6 +9,9 @@ import ProjectDetail from './pages/ProjectDetail';
 import ProjectForm from './pages/ProjectForm';
 import InvoiceList from './pages/InvoiceList';
 import InvoiceDetail from './pages/InvoiceDetail';
+import TaskList from './pages/TaskList';
+import TaskForm from './pages/TaskForm';
+import TaskDetail from './pages/TaskDetail';
 import InvoiceForm from './pages/InvoiceForm';
 import NotFound from './pages/NotFound';
 
@@ -86,6 +89,10 @@ function App() {
           <Route path="/invoices/:id" element={<InvoiceDetail />} />
           <Route path="/invoices/new" element={<InvoiceForm />} />
           <Route path="/invoices/edit/:id" element={<InvoiceForm />} />
+          <Route path="/tasks" element={<TaskList />} />
+          <Route path="/tasks/:id" element={<TaskDetail />} />
+          <Route path="/tasks/new" element={<TaskForm />} />
+          <Route path="/tasks/edit/:id" element={<TaskForm />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

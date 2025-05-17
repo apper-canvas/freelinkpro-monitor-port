@@ -44,7 +44,28 @@ export const projects = [
     startDate: '2023-10-15',
     endDate: '2024-01-15',
     budget: 12000,
+    progress: 65,
     description: 'Complete redesign of the company website with new branding elements and improved user experience.',
+    tasks: [
+      {
+        id: 'task-1',
+        title: 'Create wireframes for homepage',
+        completed: true,
+        dueDate: '2023-10-25'
+      },
+      {
+        id: 'task-2',
+        title: 'Design brand guidelines',
+        completed: true,
+        dueDate: '2023-11-05'
+      },
+      {
+        id: 'task-3',
+        title: 'Develop frontend components',
+        completed: false,
+        dueDate: '2023-12-10'
+      }
+    ],
     tags: ['Design', 'Development', 'UX']
   },
   {
@@ -55,7 +76,23 @@ export const projects = [
     startDate: '2024-01-20',
     endDate: '2024-04-30',
     budget: 25000,
+    progress: 10,
     description: 'Develop a native mobile application for both iOS and Android platforms.',
+    tasks: [
+      {
+        id: 'task-4',
+        title: 'Create app architecture document',
+        completed: true,
+        dueDate: '2024-01-30'
+      },
+      {
+        id: 'task-5',
+        title: 'Design UI mockups for key screens',
+        completed: false,
+        dueDate: '2024-02-15'
+      }
+    ],
+
     tags: ['Mobile', 'Development', 'UI/UX']
   },
   {
@@ -66,10 +103,91 @@ export const projects = [
     startDate: '2023-08-01',
     endDate: '2023-11-30',
     budget: 8500,
+    progress: 100,
     description: 'Q4 marketing campaign including social media, email marketing, and content creation.',
+    tasks: [
+      {
+        id: 'task-6',
+        title: 'Create content calendar',
+        completed: true,
+        dueDate: '2023-08-15'
+      },
+      {
+        id: 'task-7',
+        title: 'Design social media graphics',
+        completed: true,
+        dueDate: '2023-09-01'
+      },
+      {
+        id: 'task-8',
+        title: 'Write email newsletter copy',
+        completed: true,
+        dueDate: '2023-09-15'
+      }
+    ],
     tags: ['Marketing', 'Content', 'Social Media']
   }
 ];
+
+// Tasks data
+export const tasks = [
+  {
+    id: 'task-1',
+    title: 'Create wireframes for homepage',
+    description: 'Design wireframes for the new homepage layout focusing on improved user experience and conversion optimization.',
+    projectId: '1',
+    status: 'completed',
+    priority: 'high',
+    dueDate: '2023-10-25',
+    completed: true,
+    assignedTo: null,
+    createdAt: '2023-10-15',
+    updatedAt: '2023-10-24'
+  },
+  {
+    id: 'task-2',
+    title: 'Design brand guidelines',
+    description: 'Create comprehensive brand guidelines document including logo usage, color palette, typography, and graphic elements.',
+    projectId: '1',
+    status: 'completed',
+    priority: 'medium',
+    dueDate: '2023-11-05',
+    completed: true,
+    assignedTo: null,
+    createdAt: '2023-10-20',
+    updatedAt: '2023-11-04'
+  },
+  {
+    id: 'task-3',
+    title: 'Develop frontend components',
+    description: 'Build reusable UI components based on the approved designs using React and styled components.',
+    projectId: '1',
+    status: 'in-progress',
+    priority: 'high',
+    dueDate: '2023-12-10',
+    completed: false,
+    assignedTo: null,
+    createdAt: '2023-11-10',
+    updatedAt: '2023-11-10'
+  },
+  {
+    id: 'task-4',
+    title: 'Create app architecture document',
+    description: 'Document the application architecture including data flow, component structure, and API integrations.',
+    projectId: '2',
+    status: 'completed',
+    priority: 'high',
+    dueDate: '2024-01-30',
+    completed: true,
+    assignedTo: null,
+    createdAt: '2024-01-20',
+    updatedAt: '2024-01-29'
+  }
+];
+
+// Task status options
+export const taskStatusOptions = ['not-started', 'in-progress', 'in-review', 'completed', 'on-hold'];
+export const taskPriorityOptions = ['low', 'medium', 'high', 'urgent'];
 
 // Invoices data
 export const invoices = [
