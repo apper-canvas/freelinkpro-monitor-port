@@ -299,7 +299,7 @@ const Home = () => {
           <Link to="/invoices" className="btn-primary mt-6">
             Go to Invoices
           </Link>
-          </button>
+          
         </div>
       )}
     </div>
