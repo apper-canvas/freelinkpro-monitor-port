@@ -297,8 +297,23 @@ const Home = () => {
             Keep your finances organized and get paid faster.
           </p>
           <Link to="/invoices" className="btn-primary mt-6">
-            Go to Invoices
             Go to invoices
+          </Link>
+        </div>
+      )}
+      
+      {activeTab === 'tasks' && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <CalendarIcon className="w-16 h-16 text-surface-300 dark:text-surface-600 mb-4" />
+          <h3 className="text-xl font-medium text-surface-800 dark:text-surface-200 mb-4">
+            Task Management
+          </h3>
+          <p className="text-surface-500 dark:text-surface-400 max-w-md">
+            Track and manage all your tasks. Create, assign, and update task progress to stay organized.
+            Never miss a deadline with task reminders.
+          </p>
+          <Link to="/tasks" className="btn-primary mt-6">
+            Go to Tasks
           </Link>
         </div>
       )}
@@ -307,45 +322,3 @@ const Home = () => {
 };
 
 export default Home;
-    case 'tasks':
-      return (
-        <div>
-          <div className="card p-5 mt-4">
-            <h2 className="text-xl font-semibold mb-4">Task Management</h2>
-            <p className="text-surface-600 dark:text-surface-400 mb-6">
-              Track and manage all your tasks. Create, assign, and update task progress to stay organized.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-primary/10 dark:bg-primary/20">
-                <getIcon('CheckCircle') className="w-8 h-8 text-primary" />
-                <div>
-                  <h3 className="font-medium">Track Progress</h3>
-                  <p className="text-sm text-surface-600 dark:text-surface-400">Monitor task completion and project status</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-secondary/10 dark:bg-secondary/20">
-                <getIcon('Bell') className="w-8 h-8 text-secondary" />
-                <div>
-                  <h3 className="font-medium">Task Reminders</h3>
-                  <p className="text-sm text-surface-600 dark:text-surface-400">Never miss a deadline with task due dates</p>
-                </div>
-              </div>
-            </div>
-            <Link to="/tasks" className="btn-primary">Manage Tasks</Link>
-          </div>
-        </div>
-      );
-        </p> 
-            aria-selected={activeTab === 'dashboard'}
-            aria-selected={activeTab === 'clients'}
-            aria-selected={activeTab === 'projects'}
-            aria-selected={activeTab === 'invoices'}
-          <button
-            onClick={() => setActiveTab('tasks')}
-            className={`tab-button ${activeTab === 'tasks' ? 'active-tab' : ''}`}
-            aria-selected={activeTab === 'tasks'}
-          >
-            <getIcon('CheckSquare') className="w-5 h-5" />
-            <span>Tasks</span>
-          </button>
