@@ -19,6 +19,9 @@ const TaskList = () => {
   const PlusIcon = getIcon('Plus');
   const SearchIcon = getIcon('Search');
   const CheckCircleIcon = getIcon('CheckCircle');
+  const EyeIcon = getIcon('Eye');
+  const EditIcon = getIcon('Edit');
+  const ClipboardXIcon = getIcon('ClipboardX');
   const CircleIcon = getIcon('Circle');
   const ArrowUpIcon = getIcon('ArrowUp');
   const ArrowDownIcon = getIcon('ArrowDown');
@@ -309,13 +312,13 @@ const TaskList = () => {
                           to={`/tasks/${task.id}`}
                           className="p-1 text-surface-500 hover:text-primary"
                         >
-                          <getIcon('Eye') className="w-5 h-5" />
+                          <EyeIcon className="w-5 h-5" />
                         </Link>
                         <Link 
                           to={`/tasks/edit/${task.id}`}
                           className="p-1 text-surface-500 hover:text-primary"
                         >
-                          <getIcon('Edit') className="w-5 h-5" />
+                          <EditIcon className="w-5 h-5" />
                         </Link>
                       </div>
                     </td>
@@ -325,7 +328,7 @@ const TaskList = () => {
                 <tr>
                   <td colSpan="6" className="py-8 text-center text-surface-500">
                     <div className="flex flex-col items-center">
-                      <getIcon('ClipboardX') className="w-12 h-12 mb-2 opacity-30" />
+                      <ClipboardXIcon className="w-12 h-12 mb-2 opacity-30" />
                       <p>No tasks found matching your filters</p>
                       {(searchTerm || statusFilter !== 'all' || priorityFilter !== 'all') && (
                         <button 
