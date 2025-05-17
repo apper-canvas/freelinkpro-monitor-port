@@ -404,8 +404,8 @@ const ProjectDetail = () => {
               <div className="flex items-center gap-2 text-surface-600 dark:text-surface-400">
                 <ClockIcon className="w-4 h-4 text-accent" />
                 <div>
-                  <div className="text-xs">Due Date</div>
-                  <div>{new Date(project.dueDate).toLocaleDateString()}</div>
+                  <div className="text-xs">End Date</div>
+                  <div>{new Date(project.endDate).toLocaleDateString()}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-surface-600 dark:text-surface-400">
