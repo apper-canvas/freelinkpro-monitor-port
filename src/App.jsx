@@ -49,13 +49,19 @@ function App() {
 
   // Initialize ApperUI once when the app loads
   useEffect(() => {
+    // Check if ApperSDK is available
+    if (!window.ApperSDK) {
+      console.error("Apper SDK not available. Please check the script is loaded.");
+      setIsInitialized(true); // Still set to true to avoid blocking the UI
+      return;
+    }
+
     const { ApperClient, ApperUI } = window.ApperSDK;
     const client = new ApperClient({
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
-    
-    // Initialize but don't show login yet
+
     ApperUI.setup(client, {
       target: '#authentication',
       clientId: import.meta.env.VITE_APPER_PROJECT_ID,
@@ -115,6 +121,7 @@ function App() {
       onError: function(error) {
         console.error("Authentication failed:", error);
         toast.error("Authentication failed. Please try again.");
+        setIsInitialized(true); // Set to true even on error to avoid blocking the UI
       }
     });
   }, [dispatch, navigate]);
@@ -136,6 +143,10 @@ function App() {
     isAuthenticated,
     logout: async () => {
       try {
+        if (!window.ApperSDK) {
+          console.error("Apper SDK not available.");
+          return;
+        }
         const { ApperUI } = window.ApperSDK;
         await ApperUI.logout();
         dispatch(clearUser());
@@ -150,16 +161,16 @@ function App() {
   
   // Protected route component
   const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated } = useSelector((state) => state.user);
+    const userAuthState = useSelector((state) => state.user);
+    const isUserAuthenticated = userAuthState?.isAuthenticated || false;
     
     useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isUserAuthenticated) {
         const currentPath = window.location.pathname + window.location.search;
         navigate(`/login?redirect=${currentPath}`);
         toast.info("Please log in to access this page");
       }
-    }, [isAuthenticated, navigate]);
-    
+    }, [isUserAuthenticated, navigate]);
     if (!isAuthenticated) {
       return null;
     }
@@ -169,7 +180,11 @@ function App() {
 
   // Don't render app until authentication is initialized
   if (!isInitialized) {
-    return <div className="loading flex items-center justify-center min-h-screen">Initializing application...</div>;
+    return (
+      <div className="loading flex items-center justify-center min-h-screen">
+        <div className="text-center">Initializing application...</div>
+      </div>
+    );
   }
 
 
@@ -253,10 +268,12 @@ function App() {
                 <Home />
               </ProtectedRoute>
             } />
+            
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Home />
               </ProtectedRoute>
+            
             } />
             {/* Add ProtectedRoute to all other routes */}
             {Object.entries({
