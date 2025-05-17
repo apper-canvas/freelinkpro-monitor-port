@@ -29,8 +29,23 @@ function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isInitialized, setIsInitialized] = useState(false);
+  // Moved darkMode state declaration here to maintain hooks order
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Check if user previously set a preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+      // Check system preference
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+  
   const userState = useSelector((state) => state.user);
   const isAuthenticated = userState?.isAuthenticated || false;
+
 
   // Initialize ApperUI once when the app loads
   useEffect(() => {
@@ -104,6 +119,17 @@ function App() {
     });
   }, [dispatch, navigate]);
 
+  // Dark mode effect
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+
   // Authentication methods to share via context
   const authMethods = {
     isInitialized,
@@ -132,7 +158,7 @@ function App() {
         navigate(`/login?redirect=${currentPath}`);
         toast.info("Please log in to access this page");
       }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, navigate]);
     
     if (!isAuthenticated) {
       return null;
@@ -146,27 +172,6 @@ function App() {
     return <div className="loading flex items-center justify-center min-h-screen">Initializing application...</div>;
   }
 
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      // Check if user previously set a preference
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        return savedTheme === 'dark';
-      }
-      // Check system preference
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-  }, [darkMode]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
