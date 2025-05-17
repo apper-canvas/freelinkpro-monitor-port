@@ -61,10 +61,10 @@ function App() {
                 if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
                     navigate(currentPath);
                 } else {
-                    navigate('/dashboard');
+                    navigate('/');
                 }
             } else {
-                navigate('/dashboard');
+                navigate('/');
             }
             // Store user information in Redux
             dispatch(setUser(JSON.parse(JSON.stringify(user))));
