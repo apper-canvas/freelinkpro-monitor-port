@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { fetchClients, createClient, deleteClient as deleteClientService } from '../services/clientService';
 import { getIcon } from '../utils/iconUtils';
 
 const MainFeature = ({ clients, setClients }) => {
   // Getting icons
   const SearchIcon = getIcon('Search');
-  const PlusIcon = getIcon('Plus');
+  const PlusIcon = getIcon('Plus'); 
   const UserIcon = getIcon('User');
   const BuildingIcon = getIcon('Building2');
   const AtSignIcon = getIcon('AtSign');
@@ -33,6 +34,29 @@ const MainFeature = ({ clients, setClients }) => {
   const [tagInput, setTagInput] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Fetch clients on component mount
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        setIsLoading(true);
+        const clientsData = await fetchClients();
+        setClients(clientsData);
+      } catch (error) {
+        console.error("Failed to fetch clients:", error);
+        toast.error("Failed to load clients. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (clients.length === 0) {
+      loadClients();
+    }
+  }, [setClients, clients.length]);
 
   // Reset form when showing/hiding
   useEffect(() => {
@@ -120,69 +144,88 @@ const MainFeature = ({ clients, setClients }) => {
     }
   };
 
-  // Handle form submission
+  // Handle form submission with service integration
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.name.trim() || !formData.email.trim()) {
-      toast.error('Name and email are required fields');
-      return;
+    try {
+      // Basic validation
+      if (!formData.name.trim() || !formData.email.trim()) {
+        toast.error('Name and email are required fields');
+        return;
+      }
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        toast.error('Please enter a valid email address');
+        return;
+      }
+      
+      setIsSubmitting(true);
+      
+      if (!selectedClient) {
+        // Create new client using service
+        const newClient = await createClient({
+          ...formData,
+          lastContact: new Date().toISOString().split('T')[0]
+        });
+        
+        setClients(prevClients => [...prevClients, newClient]);
+        toast.success('Client added successfully');
+      } else {
+        // For now, just update in local state
+        // In a real implementation, you would call an updateClient service here
+        const updatedClients = clients.map(client => 
+          client.id === selectedClient 
+            ? { 
+                ...client, 
+                ...formData,
+                lastContact: client.lastContact // Preserve original lastContact
+              } 
+            : client
+        );
+        setClients(updatedClients);
+        toast.success('Client updated successfully');
+      }
+      
+      // Reset form and close it
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error submitting client:', error);
+      toast.error(error.message || 'Failed to save client. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
-    
-    if (selectedClient) {
-      // Update existing client
-      const updatedClients = clients.map(client => 
-        client.id === selectedClient 
-          ? { 
-              ...client, 
-              ...formData,
-              lastContact: client.lastContact // Preserve original lastContact
-            } 
-          : client
-      );
-      setClients(updatedClients);
-      toast.success('Client updated successfully');
-    } else {
-      // Add new client
-      const newClient = {
-        id: Date.now().toString(),
-        ...formData,
-        lastContact: new Date().toISOString().split('T')[0]
-      };
-      setClients([...clients, newClient]);
-      toast.success('Client added successfully');
-    }
-    
-    // Reset form and close it
-    setShowForm(false);
   };
 
-  // Handle delete confirmation
+  // Handle delete confirmation dialog
   const confirmDelete = (clientId) => {
     setDeleteConfirmation(clientId);
   };
 
-  // Handle actual deletion
-  const deleteClient = (clientId) => {
-    setClients(clients.filter(client => client.id !== clientId));
-    setDeleteConfirmation(null);
-    toast.success('Client deleted successfully');
+  // Handle actual deletion with service
+  const handleDeleteClient = async (clientId) => {
+    try {
+      setIsDeleting(true);
+      await deleteClientService(clientId);
+      setClients(clients.filter(client => client.id !== clientId));
+      toast.success('Client deleted successfully');
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      toast.error('Failed to delete client. Please try again.');
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmation(null);
+    }
   };
 
-  // Cancel deletion
+  // Cancel deletion operation
   const cancelDelete = () => {
     setDeleteConfirmation(null);
   };
 
-  // Open edit form for a client
+  // Open edit form for an existing client
   const editClient = (clientId) => {
     setSelectedClient(clientId);
     setShowForm(true);
@@ -227,7 +270,14 @@ const MainFeature = ({ clients, setClients }) => {
         </div>
       </div>
       
-      {filteredClients.length === 0 ? (
+      {isLoading ? (
+        <div className="card p-12 text-center animate-pulse">
+          <div className="w-12 h-12 mx-auto rounded-full bg-surface-200 dark:bg-surface-700 mb-4"></div>
+          <div className="h-6 bg-surface-200 dark:bg-surface-700 rounded w-48 mx-auto mb-2"></div>
+          <div className="h-4 bg-surface-200 dark:bg-surface-700 rounded w-64 mx-auto mb-6"></div>
+          <div className="h-10 bg-surface-200 dark:bg-surface-700 rounded w-32 mx-auto"></div>
+        </div>
+      ) : filteredClients.length === 0 ? (
         <div className="card p-12 text-center">
           <UserIcon className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600 mb-4" />
           <h3 className="text-lg font-medium text-surface-800 dark:text-surface-200 mb-2">
@@ -341,14 +391,14 @@ const MainFeature = ({ clients, setClients }) => {
                               Cancel
                             </button>
                             <button
-                              onClick={() => deleteClient(client.id)}
-                              className="px-2 py-1 text-xs font-medium text-white bg-accent hover:bg-accent/90 rounded"
+                              onClick={() => handleDeleteClient(client.id)}
+                              className={`px-2 py-1 text-xs font-medium text-white bg-accent hover:bg-accent/90 rounded ${isDeleting ? 'opacity-70 cursor-wait' : ''}`}
+                              disabled={isDeleting}
                             >
-                              Delete
+                              {isDeleting ? 'Deleting...' : 'Delete'}
                             </button>
                           </div>
                         </div>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -356,7 +406,7 @@ const MainFeature = ({ clients, setClients }) => {
             </tbody>
           </table>
         </div>
-      )}
+      ))}
       
       {/* Client Form Modal */}
       <AnimatePresence>
@@ -527,7 +577,8 @@ const MainFeature = ({ clients, setClients }) => {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="w-full btn-primary flex items-center justify-center gap-2"
+                      className={`w-full btn-primary flex items-center justify-center gap-2 ${isSubmitting ? 'opacity-70 cursor-wait' : ''}`}
+                      disabled={isSubmitting}
                     >
                       <CheckIcon className="w-5 h-5" />
                       <span>{selectedClient ? 'Update Client' : 'Add Client'}</span>

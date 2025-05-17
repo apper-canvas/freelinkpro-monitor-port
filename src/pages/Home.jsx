@@ -5,7 +5,6 @@ import { clients as mockClients, tasks as mockTasks, invoices as mockInvoices } 
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
-
 const Home = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   
@@ -13,7 +12,7 @@ const Home = () => {
   const [clients, setClients] = useState(mockClients);
   
   // Calculate dashboard metrics
-  const activeClientsCount = mockClients.filter(c => c.status === 'active').length;
+  const [clients, setClients] = useState([]);
   const totalClientsCount = mockClients.length;
   
   const tasksDueCount = mockTasks.filter(task => !task.completed && task.dueDate).length;
