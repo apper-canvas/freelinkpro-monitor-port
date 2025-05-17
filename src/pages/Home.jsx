@@ -289,15 +289,16 @@ const Home = () => {
       {activeTab === 'invoices' && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <FileTextIcon className="w-16 h-16 text-surface-300 dark:text-surface-600 mb-4" />
-          <h3 className="text-xl font-medium text-surface-800 dark:text-surface-200 mb-2">
+          <h3 className="text-xl font-medium text-surface-800 dark:text-surface-200 mb-4">
             Invoice Management
           </h3>
           <p className="text-surface-500 dark:text-surface-400 max-w-md">
-            Create invoices, track payments, and manage your billing in this section.
-            This feature will be available in the next update.
+            Create professional invoices, track payments, and manage your billing all in one place.
+            Keep your finances organized and get paid faster.
           </p>
-          <button className="btn-outline mt-6">
-            Coming Soon
+          <Link to="/invoices" className="btn-primary mt-6">
+            Go to Invoices
+          </Link>
           </button>
         </div>
       )}

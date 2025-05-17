@@ -7,6 +7,9 @@ import Home from './pages/Home';
 import ProjectList from './pages/ProjectList';
 import ProjectDetail from './pages/ProjectDetail';
 import ProjectForm from './pages/ProjectForm';
+import InvoiceList from './pages/InvoiceList';
+import InvoiceDetail from './pages/InvoiceDetail';
+import InvoiceForm from './pages/InvoiceForm';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -79,6 +82,10 @@ function App() {
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/projects/new" element={<ProjectForm />} />
           <Route path="/projects/edit/:id" element={<ProjectForm />} />
+          <Route path="/invoices" element={<InvoiceList />} />
+          <Route path="/invoices/:id" element={<InvoiceDetail />} />
+          <Route path="/invoices/new" element={<InvoiceForm />} />
+          <Route path="/invoices/edit/:id" element={<InvoiceForm />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

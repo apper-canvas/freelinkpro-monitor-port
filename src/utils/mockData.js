@@ -1,5 +1,6 @@
-import { format, addDays, subDays } from 'date-fns';
+// Mock data for the application
 
+// Clients data
 export const clients = [
   {
     id: '1',
@@ -33,61 +34,100 @@ export const clients = [
   }
 ];
 
-const today = new Date();
-
+// Projects data
 export const projects = [
   {
     id: '1',
     name: 'Website Redesign',
     clientId: '1',
-    description: 'Complete overhaul of the company website with modern design and improved user experience.',
-    startDate: format(subDays(today, 30), 'yyyy-MM-dd'),
-    dueDate: format(addDays(today, 15), 'yyyy-MM-dd'),
     status: 'in-progress',
-    progress: 65,
-    budget: 8500,
-    tags: ['Design', 'UX/UI', 'Development'],
-    tasks: [
-      { id: '101', title: 'Wireframes', completed: true, dueDate: format(subDays(today, 15), 'yyyy-MM-dd') },
-      { id: '102', title: 'Design System', completed: true, dueDate: format(subDays(today, 5), 'yyyy-MM-dd') },
-      { id: '103', title: 'Frontend Development', completed: false, dueDate: format(addDays(today, 5), 'yyyy-MM-dd') },
-      { id: '104', title: 'Content Migration', completed: false, dueDate: format(addDays(today, 10), 'yyyy-MM-dd') }
-    ]
+    startDate: '2023-10-15',
+    endDate: '2024-01-15',
+    budget: 12000,
+    description: 'Complete redesign of the company website with new branding elements and improved user experience.',
+    tags: ['Design', 'Development', 'UX']
   },
   {
     id: '2',
     name: 'Mobile App Development',
     clientId: '2',
-    description: 'Creating a cross-platform mobile application for inventory management with offline capabilities.',
-    startDate: format(subDays(today, 60), 'yyyy-MM-dd'),
-    dueDate: format(addDays(today, 30), 'yyyy-MM-dd'),
-    status: 'in-progress',
-    progress: 40,
-    budget: 12000,
-    tags: ['Mobile', 'Development', 'React Native'],
-    tasks: [
-      { id: '201', title: 'Requirements Gathering', completed: true, dueDate: format(subDays(today, 50), 'yyyy-MM-dd') },
-      { id: '202', title: 'UI Design', completed: true, dueDate: format(subDays(today, 30), 'yyyy-MM-dd') },
-      { id: '203', title: 'Core Features Development', completed: false, dueDate: format(addDays(today, 10), 'yyyy-MM-dd') },
-      { id: '204', title: 'Testing', completed: false, dueDate: format(addDays(today, 25), 'yyyy-MM-dd') }
-    ]
+    status: 'planned',
+    startDate: '2024-01-20',
+    endDate: '2024-04-30',
+    budget: 25000,
+    description: 'Develop a native mobile application for both iOS and Android platforms.',
+    tags: ['Mobile', 'Development', 'UI/UX']
   },
   {
     id: '3',
     name: 'Marketing Campaign',
     clientId: '3',
-    description: 'Quarterly marketing campaign for product launch including social media, email, and content marketing.',
-    startDate: format(subDays(today, 15), 'yyyy-MM-dd'),
-    dueDate: format(addDays(today, 45), 'yyyy-MM-dd'),
-    status: 'planning',
-    progress: 20,
-    budget: 5000,
-    tags: ['Marketing', 'Content', 'Social Media'],
-    tasks: [
-      { id: '301', title: 'Campaign Strategy', completed: true, dueDate: format(subDays(today, 5), 'yyyy-MM-dd') },
-      { id: '302', title: 'Content Creation', completed: false, dueDate: format(addDays(today, 10), 'yyyy-MM-dd') },
-      { id: '303', title: 'Channel Setup', completed: false, dueDate: format(addDays(today, 20), 'yyyy-MM-dd') },
-      { id: '304', title: 'Performance Analysis', completed: false, dueDate: format(addDays(today, 40), 'yyyy-MM-dd') }
-    ]
+    status: 'completed',
+    startDate: '2023-08-01',
+    endDate: '2023-11-30',
+    budget: 8500,
+    description: 'Q4 marketing campaign including social media, email marketing, and content creation.',
+    tags: ['Marketing', 'Content', 'Social Media']
+  }
+];
+
+// Invoices data
+export const invoices = [
+  {
+    id: '1',
+    invoiceNumber: 'INV-2023-001',
+    clientId: '1',
+    projectId: '1',
+    issueDate: '2023-11-01',
+    dueDate: '2023-11-15',
+    status: 'paid',
+    items: [
+      { description: 'Website Design - Initial Phase', quantity: 1, rate: 2500, amount: 2500 },
+      { description: 'Brand Identity Development', quantity: 1, rate: 1200, amount: 1200 }
+    ],
+    subtotal: 3700,
+    tax: 370,
+    total: 4070,
+    amountPaid: 4070,
+    notes: 'Thank you for your business!',
+    paymentDate: '2023-11-12'
+  },
+  {
+    id: '2',
+    invoiceNumber: 'INV-2023-002',
+    clientId: '2',
+    projectId: '2',
+    issueDate: '2023-12-01',
+    dueDate: '2023-12-15',
+    status: 'pending',
+    items: [
+      { description: 'App Development Planning', quantity: 1, rate: 3000, amount: 3000 },
+      { description: 'UI/UX Wireframes', quantity: 1, rate: 1800, amount: 1800 }
+    ],
+    subtotal: 4800,
+    tax: 480,
+    total: 5280,
+    amountPaid: 0,
+    notes: 'Please make payment by the due date.',
+    paymentDate: null
+  },
+  {
+    id: '3',
+    invoiceNumber: 'INV-2023-003',
+    clientId: '3',
+    projectId: '3',
+    issueDate: '2023-10-15',
+    dueDate: '2023-10-29',
+    status: 'overdue',
+    items: [
+      { description: 'Social Media Campaign Management', quantity: 1, rate: 1500, amount: 1500 },
+      { description: 'Content Creation (5 articles)', quantity: 5, rate: 200, amount: 1000 }
+    ],
+    subtotal: 2500,
+    tax: 250,
+    total: 2750,
+    amountPaid: 0,
+    notes: 'Payment is now overdue. Please settle this invoice as soon as possible.',
+    paymentDate: null
   }
 ];
