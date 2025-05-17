@@ -299,6 +299,14 @@ const Home = () => {
           <FileTextIcon className="w-16 h-16 text-surface-300 dark:text-surface-600 mb-4" />
           <h3 className="text-xl font-medium text-surface-800 dark:text-surface-200 mb-4">
             Invoice Management
+            <li>
+              <Link to="/projects" className="flex items-center p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700 group">
+                <div className="w-7 h-7 flex items-center justify-center mr-1">
+                  {getIcon('Receipt')({ className: 'w-5 h-5' })}
+                </div>
+                <div className="ml-2">Expense Tracking</div>
+              </Link>
+            </li>
           </h3>
           <p className="text-surface-500 dark:text-surface-400 max-w-md">
             Create professional invoices, track payments, and manage your billing all in one place.

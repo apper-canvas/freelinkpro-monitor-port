@@ -16,6 +16,7 @@ import TimeEntryForm from './components/TimeEntryForm';
 import InvoiceForm from './pages/InvoiceForm';
 import NotFound from './pages/NotFound';
 
+
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -86,6 +87,8 @@ function App() {
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/projects/new" element={<ProjectForm />} />
           <Route path="/projects/edit/:id" element={<ProjectForm />} />
+          <Route path="/projects/:id/expenses" element={<ProjectDetail />} />
+          <Route path="/projects/:id/expenses/:expenseId" element={<ProjectDetail />} />
           <Route path="/invoices" element={<InvoiceList />} />
           <Route path="/invoices/:id" element={<InvoiceDetail />} />
           <Route path="/invoices/new" element={<InvoiceForm />} />

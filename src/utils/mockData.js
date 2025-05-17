@@ -34,6 +34,16 @@ export const clients = [
   }
 ];
 
+// Expense categories
+export const expenseCategories = [
+  'Software',
+  'Hardware',
+  'Office Supplies',
+  'Travel',
+  'Meals',
+  'Other'
+];
+
 // Projects data
 export const projects = [
   {
@@ -87,60 +97,33 @@ export const projects = [
         createdAt: '2023-11-02T17:05:00Z'
       }
     ],
-    hourlyRate: 85
-  },
-  {
-    id: '1',
-    name: 'Website Redesign',
-    clientId: '1',
-    status: 'in-progress',
-    startDate: '2023-10-15',
-    endDate: '2024-01-15',
-    budget: 12000,
-    progress: 65,
-    description: 'Complete redesign of the company website with new branding elements and improved user experience.',
-    tasks: [
+    expenses: [
       {
-        id: 'task-1',
-        title: 'Create wireframes for homepage',
-        completed: true,
-        dueDate: '2023-10-25'
+        id: 'expense-1',
+        projectId: '1',
+        date: '2023-11-05',
+        amount: 49.99,
+        category: 'Software',
+        description: 'Adobe Creative Cloud monthly subscription',
+        receipt: null,
+        billable: true,
+        reimbursable: false,
+        createdAt: '2023-11-05T14:35:00Z'
       },
       {
-        id: 'task-2',
-        title: 'Design brand guidelines',
-        completed: true,
-        dueDate: '2023-11-05'
-      },
-      {
-        id: 'task-3',
-        title: 'Develop frontend components',
-        completed: false,
-        dueDate: '2023-12-10'
+        id: 'expense-2',
+        projectId: '1',
+        date: '2023-11-10',
+        amount: 25.75,
+        category: 'Meals',
+        description: 'Lunch meeting with client to discuss design revisions',
+        receipt: 'receipt.jpg',
+        billable: true,
+        reimbursable: true,
+        createdAt: '2023-11-10T18:20:00Z'
       }
     ],
-    tags: ['Design', 'Development', 'UX'],
-    timeEntries: [
-      {
-        id: 'time-1',
-        date: '2023-11-01',
-        startTime: '09:00',
-        endTime: '12:30',
-        duration: 3.5,
-        description: 'Initial wireframing and client meeting',
-        createdAt: '2023-11-01T12:35:00Z'
-      },
-      {
-        id: 'time-2',
-        date: '2023-11-02',
-        startTime: '14:00',
-        endTime: '17:00',
-        duration: 3,
-        description: 'Design system setup and component design',
-        createdAt: '2023-11-02T17:05:00Z'
-      }
-    ],
-    hourlyRate: 85
+    hourlyRate: 85    
   },
   {
     id: '2',
@@ -171,6 +154,7 @@ export const projects = [
     timeEntries: [
       
     ],
+    expenses: [],
     hourlyRate: 95
   },
   {
@@ -207,6 +191,7 @@ export const projects = [
     timeEntries: [
       
     ],
+    expenses: [],
     hourlyRate: 75
   }
 ];

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import { projects as initialProjects, clients } from '../utils/mockData';
 import TimeEntryForm from '../components/TimeEntryForm';
+import ExpenseForm from '../components/ExpenseForm';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -21,6 +22,11 @@ const ProjectDetail = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
+
+  // Expense tracking state
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
+  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState('all');
   
   // Icons
   const ChevronLeftIcon = getIcon('ChevronLeft');
@@ -42,6 +48,9 @@ const ProjectDetail = () => {
   const StopIcon = getIcon('Square');
   const PlusCircleIcon = getIcon('PlusCircle');
   const TimerIcon = getIcon('Timer');
+  const ReceiptIcon = getIcon('Receipt');
+  const DollarIcon = getIcon('DollarSign');
+  const CreditCardIcon = getIcon('CreditCard');
 
   useEffect(() => {
     const loadProject = async () => {
@@ -100,6 +109,14 @@ const ProjectDetail = () => {
     return project.timeEntries.reduce((sum, entry) => sum + entry.duration, 0);
   };
 
+  // Calculate total expenses
+  const getTotalExpenses = () => {
+    if (!project || !project.expenses) return 0;
+    return project.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  };
+  
+  // Filter expenses by category
+  
   const handleDeleteProject = () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       // In a real app, this would be an API call
@@ -236,6 +253,67 @@ const ProjectDetail = () => {
       toast.success('Time entry added');
     }
     
+  };
+
+  // Expense handling functions
+  const handleAddExpense = () => {
+    setEditingExpense(null);
+    setShowExpenseForm(true);
+  };
+  
+  const handleEditExpense = (expense) => {
+    setEditingExpense(expense);
+    setShowExpenseForm(true);
+  };
+  
+  const handleDeleteExpense = (expenseId) => {
+    if (window.confirm('Are you sure you want to delete this expense?')) {
+      const updatedExpenses = project.expenses.filter(expense => expense.id !== expenseId);
+      
+      setProject({
+        ...project,
+        expenses: updatedExpenses
+      });
+      
+      toast.success('Expense deleted');
+    }
+  };
+  
+  const handleExpenseSubmit = (expenseData) => {
+    if (editingExpense) {
+      // Update existing expense
+      const updatedExpenses = project.expenses.map(expense =>
+        expense.id === expenseData.id ? expenseData : expense
+      );
+      
+      setProject({ ...project, expenses: updatedExpenses });
+      toast.success('Expense updated successfully');
+    } else {
+      // Add new expense
+      setProject({
+        ...project,
+        expenses: [expenseData, ...(project.expenses || [])]
+      });
+      
+      toast.success('Expense added successfully');
+    }
+  };
+  
+  // Get expenses filtered by category
+  const getFilteredExpenses = () => {
+    if (!project || !project.expenses) return [];
+    if (selectedExpenseCategory === 'all') return project.expenses;
+    return project.expenses.filter(expense => expense.category === selectedExpenseCategory);
+  };
+  
+  // Get expenses grouped by category for summary
+  const getExpensesByCategory = () => {
+    if (!project || !project.expenses) return {};
+    return project.expenses.reduce((acc, expense) => {
+      const category = expense.category || 'Uncategorized';
+      acc[category] = (acc[category] || 0) + expense.amount;
+      return acc;
+    }, {});
   };
 
   const getStatusBadge = (status) => {
@@ -511,6 +589,109 @@ const ProjectDetail = () => {
               <p className="text-center py-6 text-surface-500">No time entries yet. Click the + button to add one or start the timer.</p>
             )}
           </motion.div>
+
+          <motion.div 
+            className="card p-5"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <ReceiptIcon className="w-5 h-5 text-secondary" />
+                <h2 className="text-lg font-semibold">Expense Tracking</h2>
+              </div>
+              
+              <button 
+                onClick={handleAddExpense}
+                className="p-1.5 rounded-full bg-secondary/10 text-secondary hover:bg-secondary/20"
+                title="Add expense"
+              >
+                <PlusCircleIcon className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <div className="flex justify-between text-sm text-surface-600 dark:text-surface-400 mb-2">
+                <span>Total Expenses</span>
+                <span className="font-semibold">${getTotalExpenses().toFixed(2)}</span>
+              </div>
+              
+              {/* Expense Summary by Category */}
+              <div className="bg-surface-50 dark:bg-surface-800 p-3 rounded-lg mb-4">
+                <h4 className="text-xs font-medium text-surface-500 mb-2">EXPENSE BREAKDOWN</h4>
+                <div className="space-y-2">
+                  {Object.entries(getExpensesByCategory()).map(([category, amount]) => (
+                    <div key={category} className="flex justify-between text-sm">
+                      <span>{category}</span>
+                      <span>${amount.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Category Filter */}
+              <div className="flex mb-3">
+                <select
+                  value={selectedExpenseCategory}
+                  onChange={(e) => setSelectedExpenseCategory(e.target.value)}
+                  className="input text-sm py-1"
+                >
+                  <option value="all">All Categories</option>
+                  {Object.keys(getExpensesByCategory()).map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {project.expenses && project.expenses.length > 0 ? (
+              <div className="space-y-2 mt-4">
+                <div className="grid grid-cols-12 text-xs font-medium text-surface-500 dark:text-surface-400 pb-2 border-b border-surface-200 dark:border-surface-700">
+                  <div className="col-span-2">Date</div>
+                  <div className="col-span-2">Amount</div>
+                  <div className="col-span-2">Category</div>
+                  <div className="col-span-4">Description</div>
+                  <div className="col-span-2">Actions</div>
+                </div>
+                
+                {getFilteredExpenses().map(expense => (
+                  <div key={expense.id} className="grid grid-cols-12 py-2 text-sm border-b border-surface-100 dark:border-surface-800">
+                    <div className="col-span-2 flex items-center">
+                      <CalendarIcon className="w-3.5 h-3.5 mr-1.5 text-surface-400" />
+                      {expense.date}
+                    </div>
+                    <div className="col-span-2 flex items-center">
+                      <DollarIcon className="w-3.5 h-3.5 mr-1.5 text-surface-400" />
+                      ${expense.amount.toFixed(2)}
+                    </div>
+                    <div className="col-span-2 flex items-center">
+                      <TagIcon className="w-3.5 h-3.5 mr-1.5 text-surface-400" />
+                      {expense.category}
+                    </div>
+                    <div className="col-span-4 truncate">
+                      {expense.description}
+                      {expense.billable && (
+                        <span className="ml-2 text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded">Billable</span>
+                      )}
+                    </div>
+                    <div className="col-span-2 flex items-center gap-1">
+                      <button onClick={() => handleEditExpense(expense)} className="p-1 text-surface-500 hover:text-secondary">
+                        <EditIcon className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDeleteExpense(expense.id)} className="p-1 text-surface-500 hover:text-red-500">
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-6 text-surface-500">
+                No expenses recorded yet. Click the + button to add an expense.
+              </p>
+            )}
+          </motion.div>
         </div>
         
         <div className="lg:col-span-1">
@@ -578,6 +759,14 @@ const ProjectDetail = () => {
         onClose={() => setShowTimeEntryForm(false)}
         onSubmit={handleTimeEntrySubmit}
         initialData={editingTimeEntry}
+        projectId={id}
+      />
+      
+      <ExpenseForm 
+        isOpen={showExpenseForm}
+        onClose={() => setShowExpenseForm(false)}
+        onSubmit={handleExpenseSubmit}
+        initialData={editingExpense}
         projectId={id}
       />
     </div>
