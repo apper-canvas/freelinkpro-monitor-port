@@ -11,8 +11,9 @@ const Home = () => {
   // Use mock data for clients
   const [clients, setClients] = useState(mockClients);
   
-  // Calculate dashboard metrics
-  const [clients, setClients] = useState([]);
+  // Calculate dashboard metrics 
+  const activeClientsCount = clients.filter(client => client.status === 'active').length;
+  
   const totalClientsCount = mockClients.length;
   
   const tasksDueCount = mockTasks.filter(task => !task.completed && task.dueDate).length;
