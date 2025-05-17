@@ -42,22 +42,6 @@ const Home = () => {
     }
   ]);
 
-  const handleAddDemo = () => {
-    // Demo functionality to add a sample client
-    const newClient = {
-      id: Date.now().toString(),
-      name: 'New Client',
-      company: 'Sample Company',
-      email: 'client@example.com',
-      phone: '(555) 555-5555',
-      status: 'active',
-      tags: ['New', 'Demo'],
-      lastContact: new Date().toISOString().split('T')[0]
-    };
-    
-    setClients([...clients, newClient]);
-    toast.success('Demo client added successfully!');
-  };
 
   // Getting icons
   const UsersIcon = getIcon('Users');
@@ -79,14 +63,6 @@ const Home = () => {
             Manage your clients and projects efficiently in one place
           </p>
         </div>
-        
-        <button
-          onClick={handleAddDemo}
-          className="btn-primary flex items-center gap-2"
-        >
-          <PlusIcon className="w-5 h-5" />
-          <span>Add Demo Client</span>
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
