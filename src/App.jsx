@@ -167,7 +167,9 @@ function App() {
     useEffect(() => {
       if (!isUserAuthenticated) {
         const currentPath = window.location.pathname + window.location.search;
-        navigate(`/login?redirect=${currentPath}`);
+        if (currentPath !== '/login') {
+          navigate(`/login?redirect=${currentPath}`);
+        }
         toast.info("Please log in to access this page");
       }
     }, [isUserAuthenticated, navigate]);
