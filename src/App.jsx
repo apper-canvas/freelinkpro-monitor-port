@@ -12,6 +12,7 @@ import InvoiceDetail from './pages/InvoiceDetail';
 import TaskList from './pages/TaskList';
 import TaskForm from './pages/TaskForm';
 import TaskDetail from './pages/TaskDetail';
+import TimeEntryForm from './components/TimeEntryForm';
 import InvoiceForm from './pages/InvoiceForm';
 import NotFound from './pages/NotFound';
 

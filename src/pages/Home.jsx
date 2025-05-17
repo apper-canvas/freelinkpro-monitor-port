@@ -111,6 +111,14 @@ const Home = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
+                <li className="my-1">
+                  <Link to="/projects" className="flex items-center p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700">
+                    <div className="bg-secondary/10 p-2 rounded-lg">
+                      {getIcon('Timer')('w-5 h-5 text-secondary')}
+                    </div>
+                    <div className="ml-2">Time Tracking</div>
+                  </Link>
+                </li>
         >
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Tasks Due</h3>

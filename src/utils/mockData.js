@@ -66,7 +66,81 @@ export const projects = [
         dueDate: '2023-12-10'
       }
     ],
-    tags: ['Design', 'Development', 'UX']
+    tags: ['Design', 'Development', 'UX'],
+    timeEntries: [
+      {
+        id: 'time-1',
+        date: '2023-11-01',
+        startTime: '09:00',
+        endTime: '12:30',
+        duration: 3.5,
+        description: 'Initial wireframing and client meeting',
+        createdAt: '2023-11-01T12:35:00Z'
+      },
+      {
+        id: 'time-2',
+        date: '2023-11-02',
+        startTime: '14:00',
+        endTime: '17:00',
+        duration: 3,
+        description: 'Design system setup and component design',
+        createdAt: '2023-11-02T17:05:00Z'
+      }
+    ],
+    hourlyRate: 85
+  },
+  {
+    id: '1',
+    name: 'Website Redesign',
+    clientId: '1',
+    status: 'in-progress',
+    startDate: '2023-10-15',
+    endDate: '2024-01-15',
+    budget: 12000,
+    progress: 65,
+    description: 'Complete redesign of the company website with new branding elements and improved user experience.',
+    tasks: [
+      {
+        id: 'task-1',
+        title: 'Create wireframes for homepage',
+        completed: true,
+        dueDate: '2023-10-25'
+      },
+      {
+        id: 'task-2',
+        title: 'Design brand guidelines',
+        completed: true,
+        dueDate: '2023-11-05'
+      },
+      {
+        id: 'task-3',
+        title: 'Develop frontend components',
+        completed: false,
+        dueDate: '2023-12-10'
+      }
+    ],
+    tags: ['Design', 'Development', 'UX'],
+    timeEntries: [
+      {
+        id: 'time-1',
+        date: '2023-11-01',
+        startTime: '09:00',
+        endTime: '12:30',
+        duration: 3.5,
+        description: 'Initial wireframing and client meeting',
+        createdAt: '2023-11-01T12:35:00Z'
+      },
+      {
+        id: 'time-2',
+        date: '2023-11-02',
+        startTime: '14:00',
+        endTime: '17:00',
+        duration: 3,
+        description: 'Design system setup and component design',
+        createdAt: '2023-11-02T17:05:00Z'
+      }
+    ],
+    hourlyRate: 85
   },
   {
     id: '2',
@@ -93,7 +167,11 @@ export const projects = [
       }
     ],
 
-    tags: ['Mobile', 'Development', 'UI/UX']
+    tags: ['Mobile', 'Development', 'UI/UX'],
+    timeEntries: [
+      
+    ],
+    hourlyRate: 95
   },
   {
     id: '3',
@@ -125,7 +203,11 @@ export const projects = [
         dueDate: '2023-09-15'
       }
     ],
-    tags: ['Marketing', 'Content', 'Social Media']
+    tags: ['Marketing', 'Content', 'Social Media'],
+    timeEntries: [
+      
+    ],
+    hourlyRate: 75
   }
 ];
 

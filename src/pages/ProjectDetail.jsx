@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import { projects as initialProjects, clients } from '../utils/mockData';
+import TimeEntryForm from '../components/TimeEntryForm';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -12,6 +13,14 @@ const ProjectDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [client, setClient] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+
+  // Time tracking state
+  const [showTimeEntryForm, setShowTimeEntryForm] = useState(false);
+  const [editingTimeEntry, setEditingTimeEntry] = useState(null);
+  const [activeTimer, setActiveTimer] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
   
   // Icons
   const ChevronLeftIcon = getIcon('ChevronLeft');
@@ -28,6 +37,11 @@ const ProjectDetail = () => {
   const FileIcon = getIcon('File');
   const MailIcon = getIcon('Mail');
   const PhoneIcon = getIcon('Phone');
+  const PlayIcon = getIcon('Play');
+  const PauseIcon = getIcon('Pause');
+  const StopIcon = getIcon('Square');
+  const PlusCircleIcon = getIcon('PlusCircle');
+  const TimerIcon = getIcon('Timer');
 
   useEffect(() => {
     const loadProject = async () => {
@@ -57,6 +71,34 @@ const ProjectDetail = () => {
     
     loadProject();
   }, [id, navigate]);
+
+  useEffect(() => {
+    // Cleanup timer on unmount
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // Format time in HH:MM:SS format
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    return [
+      hours.toString().padStart(2, '0'),
+      minutes.toString().padStart(2, '0'),
+      secs.toString().padStart(2, '0')
+    ].join(':');
+  };
+
+  // Calculate total hours from time entries
+  const getTotalHours = () => {
+    if (!project || !project.timeEntries) return 0;
+    return project.timeEntries.reduce((sum, entry) => sum + entry.duration, 0);
+  };
 
   const handleDeleteProject = () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
@@ -93,6 +135,107 @@ const ProjectDetail = () => {
     
     setNewTaskTitle('');
     toast.success('New task added');
+  };
+  
+  const startTimer = () => {
+    if (activeTimer) return;
+    
+    const now = new Date();
+    startTimeRef.current = now;
+    
+    setActiveTimer({
+      startTime: now.toLocaleTimeString(),
+      date: now.toISOString().split('T')[0]
+    });
+    
+    setElapsedTime(0);
+    
+    timerRef.current = setInterval(() => {
+      const seconds = Math.floor((new Date() - startTimeRef.current) / 1000);
+      setElapsedTime(seconds);
+    }, 1000);
+    
+    toast.info('Timer started');
+  };
+  
+  const stopTimer = () => {
+    if (!activeTimer) return;
+    
+    clearInterval(timerRef.current);
+    
+    const endTime = new Date();
+    const duration = (endTime - startTimeRef.current) / (1000 * 60 * 60);
+    const roundedDuration = Math.round(duration * 100) / 100;
+    
+    const timeEntry = {
+      id: `time-${Date.now()}`,
+      date: activeTimer.date,
+      startTime: startTimeRef.current.toTimeString().substring(0, 5),
+      endTime: endTime.toTimeString().substring(0, 5),
+      duration: roundedDuration,
+      description: '',
+      createdAt: new Date().toISOString()
+    };
+    
+    setEditingTimeEntry(timeEntry);
+    setShowTimeEntryForm(true);
+    
+    setActiveTimer(null);
+    setElapsedTime(0);
+    
+    toast.info('Timer stopped');
+  };
+  
+  const pauseTimer = () => {
+    if (!activeTimer) return;
+    
+    // For a real implementation, we would save the elapsed time and continue from there
+    // For this demo, we'll just show a notification
+    toast.info('Timer paused. This is a placeholder - in a real app, the timer would be paused.');
+  };
+  
+  const handleAddTimeEntry = () => {
+    setEditingTimeEntry(null);
+    setShowTimeEntryForm(true);
+  };
+  
+  const handleEditTimeEntry = (timeEntry) => {
+    setEditingTimeEntry(timeEntry);
+    setShowTimeEntryForm(true);
+  };
+  
+  const handleDeleteTimeEntry = (timeEntryId) => {
+    if (window.confirm('Are you sure you want to delete this time entry?')) {
+      const updatedTimeEntries = project.timeEntries.filter(entry => entry.id !== timeEntryId);
+      
+      setProject({
+        ...project,
+        timeEntries: updatedTimeEntries
+      });
+      
+      toast.success('Time entry deleted');
+    }
+  };
+  
+  const handleTimeEntrySubmit = (timeEntryData) => {
+    if (editingTimeEntry) {
+      // Update existing entry
+      const updatedTimeEntries = project.timeEntries.map(entry =>
+        entry.id === timeEntryData.id ? timeEntryData : entry
+      );
+      
+      setProject({ ...project, timeEntries: updatedTimeEntries });
+      toast.success('Time entry updated');
+    } else {
+      // Add new entry
+      setProject({
+        ...project,
+        timeEntries: [timeEntryData, ...(project.timeEntries || [])]
+      });
+      
+      toast.success('Time entry added');
+    }
+    
   };
 
   const getStatusBadge = (status) => {
@@ -269,6 +412,105 @@ const ProjectDetail = () => {
               </button>
             </form>
           </motion.div>
+
+          <motion.div 
+            className="card p-5"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <TimerIcon className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-semibold">Time Tracking</h2>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {activeTimer ? (
+                  <>
+                    <div className="text-sm bg-primary/10 text-primary px-2 py-1 rounded-md font-mono">
+                      {formatTime(elapsedTime)}
+                    </div>
+                    <button 
+                      onClick={pauseTimer}
+                      className="p-1.5 rounded-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                      title="Pause timer"
+                    >
+                      <PauseIcon className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={stopTimer}
+                      className="p-1.5 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
+                      title="Stop timer"
+                    >
+                      <StopIcon className="w-4 h-4" />
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    onClick={startTimer}
+                    className="p-1.5 rounded-full bg-green-100 text-green-700 hover:bg-green-200"
+                    title="Start timer"
+                  >
+                    <PlayIcon className="w-4 h-4" />
+                  </button>
+                )}
+                <button 
+                  onClick={handleAddTimeEntry}
+                  className="p-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+                  title="Add time entry"
+                >
+                  <PlusCircleIcon className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <div className="flex justify-between text-sm text-surface-600 dark:text-surface-400 mb-1">
+                <span>Total Hours</span>
+                <span className="font-semibold">{getTotalHours().toFixed(2)} hrs</span>
+              </div>
+              <div className="flex justify-between text-sm text-surface-600 dark:text-surface-400">
+                <span>Total Billable ({project.hourlyRate ? `$${project.hourlyRate}/hr` : 'Not set'})</span>
+                <span className="font-semibold">${(getTotalHours() * (project.hourlyRate || 0)).toFixed(2)}</span>
+              </div>
+            </div>
+
+            {project.timeEntries && project.timeEntries.length > 0 ? (
+              <div className="space-y-2 mt-4">
+                <div className="grid grid-cols-12 text-xs font-medium text-surface-500 dark:text-surface-400 pb-2 border-b border-surface-200 dark:border-surface-700">
+                  <div className="col-span-2">Date</div>
+                  <div className="col-span-2">Duration</div>
+                  <div className="col-span-6">Description</div>
+                  <div className="col-span-2">Actions</div>
+                </div>
+                
+                {project.timeEntries.map(entry => (
+                  <div key={entry.id} className="grid grid-cols-12 py-2 text-sm border-b border-surface-100 dark:border-surface-800">
+                    <div className="col-span-2 flex items-center">
+                      <CalendarIcon className="w-3.5 h-3.5 mr-1.5 text-surface-400" />
+                      {entry.date}
+                    </div>
+                    <div className="col-span-2 flex items-center">
+                      <ClockIcon className="w-3.5 h-3.5 mr-1.5 text-surface-400" />
+                      {entry.duration.toFixed(2)} hrs
+                    </div>
+                    <div className="col-span-6 truncate">{entry.description}</div>
+                    <div className="col-span-2 flex items-center gap-1">
+                      <button onClick={() => handleEditTimeEntry(entry)} className="p-1 text-surface-500 hover:text-primary">
+                        <EditIcon className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDeleteTimeEntry(entry.id)} className="p-1 text-surface-500 hover:text-red-500">
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-6 text-surface-500">No time entries yet. Click the + button to add one or start the timer.</p>
+            )}
+          </motion.div>
         </div>
         
         <div className="lg:col-span-1">
@@ -330,6 +572,14 @@ const ProjectDetail = () => {
           </motion.div>
         </div>
       </div>
+      
+      <TimeEntryForm 
+        isOpen={showTimeEntryForm}
+        onClose={() => setShowTimeEntryForm(false)}
+        onSubmit={handleTimeEntrySubmit}
+        initialData={editingTimeEntry}
+        projectId={id}
+      />
     </div>
   );
 };
