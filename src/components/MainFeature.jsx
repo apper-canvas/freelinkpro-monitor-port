@@ -407,7 +407,7 @@ const MainFeature = ({ clients, setClients }) => {
             </tbody>
           </table>
         </div>
-      ))}
+      )}
       
       {/* Client Form Modal */}
       <AnimatePresence>
