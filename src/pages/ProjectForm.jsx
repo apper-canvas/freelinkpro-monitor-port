@@ -18,9 +18,9 @@ const ProjectForm = () => {
   const initialFormState = {
     name: '',
     description: '',
-    clientId: '',
-    startDate: '',
-    dueDate: '',
+    clientId: null,
+    startDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     status: 'planning',
     budget: '',
     tags: []
@@ -28,12 +28,31 @@ const ProjectForm = () => {
   
   const [formData, setFormData] = useState(initialFormState);
   const [tagInput, setTagInput] = useState('');
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   
   // Icons
   const ChevronLeftIcon = getIcon('ChevronLeft');
   const SaveIcon = getIcon('Save');
   const XIcon = getIcon('X');
   const PlusIcon = getIcon('Plus');
+  
+  // Predefined tag options based on the schema
+  const predefinedTags = [
+    'Design',
+    'Development',
+    'UX',
+    'Mobile',
+    'UI/UX',
+    'Marketing',
+    'Content',
+    'Social Media',
+    'Web',
+    'Branding',
+    'Strategy'
+  ];
+  
+  // Filter out already selected tags
+  const availableTags = predefinedTags.filter(tag => !formData.tags.includes(tag));
   
   useEffect(() => {
     const loadData = async () => {
@@ -98,6 +117,15 @@ const ProjectForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
     // Clear error for this field when user starts typing
@@ -113,6 +141,7 @@ const ProjectForm = () => {
         tags: [...prev.tags, tagInput.trim()]
       }));
       setTagInput('');
+    setShowTagDropdown(false);
     }
   };
 
@@ -121,6 +150,16 @@ const ProjectForm = () => {
       ...prev,
       tags: prev.tags.filter(tag => tag !== tagToRemove)
     }));
+  };
+  
+  const selectTag = (tag) => {
+    if (!formData.tags.includes(tag)) {
+      setFormData(prev => ({ 
+        ...prev, 
+        tags: [...prev.tags, tag]
+      }));
+    }
+    setShowTagDropdown(false);
   };
 
   const validateForm = () => {
@@ -189,7 +228,7 @@ const ProjectForm = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent shadow-lg"></div>
       </div>
     );
   }
@@ -208,7 +247,7 @@ const ProjectForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 space-y-1">
               <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Project Name*
               </label>
@@ -217,7 +256,7 @@ const ProjectForm = () => {
                 id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 className={`input ${formErrors.name ? 'border-red-500 dark:border-red-500' : ''}`}
                 placeholder="Enter project name"
               />
@@ -232,7 +271,7 @@ const ProjectForm = () => {
                 id="description"
                 name="description"
                 value={formData.description}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 rows={4}
                 className={`input ${formErrors.description ? 'border-red-500 dark:border-red-500' : ''}`}
                 placeholder="Describe the project in detail"
@@ -240,7 +279,7 @@ const ProjectForm = () => {
               {formErrors.description && <p className="mt-1 text-sm text-red-500">{formErrors.description}</p>}
             </div>
 
-            <div>
+            <div className="space-y-1">
               <label htmlFor="clientId" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Client*
               </label>
@@ -248,10 +287,15 @@ const ProjectForm = () => {
                 id="clientId"
                 name="clientId"
                 value={formData.clientId}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 className={`input ${formErrors.clientId ? 'border-red-500 dark:border-red-500' : ''}`}
               >
                 <option value="">Select a client</option>
+                {clientsList.length === 0 && (
+                  <option disabled value="">
+                    No clients available - please create a client first
+                  </option>
+                )}
                 {clientsList.map(client => (
                   <option key={client.id} value={client.id}>
                     {client.name}{client.company ? ` - ${client.company}` : ''}
@@ -261,7 +305,7 @@ const ProjectForm = () => {
               {formErrors.clientId && <p className="mt-1 text-sm text-red-500">{formErrors.clientId}</p>}
             </div>
 
-            <div>
+            <div className="space-y-1">
               <label htmlFor="status" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Status
               </label>
@@ -269,7 +313,7 @@ const ProjectForm = () => {
                 id="status"
                 name="status"
                 value={formData.status}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 className="input"
               >
                 <option value="planning">Planning</option>
@@ -279,7 +323,7 @@ const ProjectForm = () => {
               </select>
             </div>
 
-            <div>
+            <div className="space-y-1">
               <label htmlFor="startDate" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Start Date*
               </label>
@@ -288,7 +332,8 @@ const ProjectForm = () => {
                 id="startDate"
                 name="startDate"
                 value={formData.startDate}
-                onChange={handleChange}
+                max={formData.dueDate}
+                onChange={handleInputChange}
                 className={`input ${formErrors.startDate ? 'border-red-500 dark:border-red-500' : ''}`}
               />
               {formErrors.startDate && <p className="mt-1 text-sm text-red-500">{formErrors.startDate}</p>}
@@ -303,7 +348,8 @@ const ProjectForm = () => {
                 id="dueDate"
                 name="dueDate"
                 value={formData.dueDate}
-                onChange={handleChange}
+                min={formData.startDate}
+                onChange={handleInputChange}
                 className={`input ${formErrors.dueDate ? 'border-red-500 dark:border-red-500' : ''}`}
               />
               {formErrors.dueDate && <p className="mt-1 text-sm text-red-500">{formErrors.dueDate}</p>}
@@ -318,7 +364,7 @@ const ProjectForm = () => {
                 id="budget"
                 name="budget"
                 value={formData.budget}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 min="0"
                 className={`input ${formErrors.budget ? 'border-red-500 dark:border-red-500' : ''}`}
                 placeholder="Enter project budget"
@@ -326,43 +372,74 @@ const ProjectForm = () => {
               {formErrors.budget && <p className="mt-1 text-sm text-red-500">{formErrors.budget}</p>}
             </div>
 
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Tags
               </label>
-              <div className="flex flex-wrap gap-2 mb-2">
+              <div className="flex flex-wrap gap-2 mb-3 min-h-8">
                 {formData.tags.map((tag, index) => (
-                  <div key={index} className="tag flex items-center gap-1">
+                  <div key={index} className="tag flex items-center gap-1 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light px-2 py-1 rounded-md">
                     <span>{tag}</span>
                     <button 
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="rounded-full hover:bg-surface-200 dark:hover:bg-surface-600 p-0.5"
+                      className="rounded-full hover:bg-surface-200/50 dark:hover:bg-surface-600/50 p-0.5 ml-1 transition-colors duration-150"
+                      aria-label={`Remove ${tag} tag`}
                     >
-                      <XIcon className="w-3 h-3" />
+                      <XIcon className="w-3 h-3 text-primary" />
                     </button>
                   </div>
                 ))}
+                {formData.tags.length === 0 && (
+                  <div className="text-surface-400 dark:text-surface-500 text-sm italic">
+                    No tags added yet
+                  </div>
+                )}
               </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  className="input flex-1"
-                  placeholder="Add a tag (e.g., Design, Development)"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addTag();
-                    }
-                  }}
-                />
-                <button 
-                  type="button"
-                  onClick={addTag}
-                  className="btn-outline px-3"
-                >
+              <div className="flex gap-2 relative">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    className="input flex-1 pr-10"
+                    placeholder="Add a tag or select from list"
+                    value={tagInput}
+                    onChange={(e) => {
+                      setTagInput(e.target.value);
+                      setShowTagDropdown(true);
+                    }}
+                    onFocus={() => setShowTagDropdown(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addTag();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300"
+                    onClick={() => setShowTagDropdown(!showTagDropdown)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                  {showTagDropdown && availableTags.length > 0 && (
+                    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-surface-700 shadow-lg rounded-md border border-surface-200 dark:border-surface-600 py-1 max-h-48 overflow-y-auto">
+                      {availableTags.map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-surface-100 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300"
+                          onClick={() => selectTag(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button type="button" onClick={addTag} className="btn-outline px-3">
                   <PlusIcon className="w-5 h-5" />
                 </button>
               </div>
@@ -376,9 +453,12 @@ const ProjectForm = () => {
           </Link>
           <button 
             type="submit" 
-            className="btn-primary flex items-center gap-2" 
+            className={`btn-primary flex items-center gap-2 min-w-[12rem] justify-center ${isSubmitting ? 'opacity-70' : ''}`} 
             disabled={isSubmitting}
           >
+            {isSubmitting && (
+              <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></div>
+            )}
             <SaveIcon className="w-4 h-4" />
             <span>{isEditing ? 'Update Project' : 'Create Project'}</span>
           </button>
