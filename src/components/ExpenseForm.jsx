@@ -201,6 +201,7 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
             {formErrors.category && <p className="mt-1 text-sm text-red-500">{formErrors.category}</p>}
           </div>
           
+          <div>
             <label htmlFor="description" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
               Description*
             </label>
