@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { getIcon } from '../utils/iconUtils';
-import { invoices as mockInvoices, clients as mockClients } from '../utils/mockData';
+import { fetchInvoices, deleteInvoice } from '../services/invoiceService';
+import { fetchClients } from '../services/clientService';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [totalInvoices, setTotalInvoices] = useState(0);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +17,7 @@ const InvoiceList = () => {
   const [sortConfig, setSortConfig] = useState({ key: 'issueDate', direction: 'desc' });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [error, setError] = useState(null);
   
   const navigate = useNavigate();
   
@@ -29,71 +32,63 @@ const InvoiceList = () => {
   const ArrowLeftIcon = getIcon('ArrowLeft');
   const ArrowRightIcon = getIcon('ArrowRight');
   const FilePlusIcon = getIcon('FilePlus');
+  const AlertCircleIcon = getIcon('AlertCircle');
   
-  // Load data
+  // Load invoice data with filtering, sorting and pagination
   useEffect(() => {
-    // In a real app, this would be an API call
-    setTimeout(() => {
-      setInvoices(mockInvoices);
-      setClients(mockClients);
-      setLoading(false);
-    }, 500);
-  }, []);
-  
-  // Filter and sort invoices
-  useEffect(() => {
-    let result = [...invoices];
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Convert sort key for backend compatibility
+        let sortField = sortConfig.key;
+        if (sortField === 'client') {
+          sortField = 'clientId';
+        } else if (sortField === 'amount') {
+          sortField = 'total';
+        }
+        
+        // Fetch invoices from the service
+        const { data, total } = await fetchInvoices({
+          searchTerm,
+          status: statusFilter,
+          sortField,
+          sortDirection: sortConfig.direction,
+          page: currentPage,
+          limit: itemsPerPage
+        });
+        
+        setInvoices(data);
+        setTotalInvoices(total);
+        
+        // Load clients for display purposes
+        const clientsData = await fetchClients();
+        setClients(clientsData || []);
+        
+        setLoading(false);
+      } catch (err) {
+        console.error("Error loading invoices:", err);
+        setError("Failed to load invoices. Please try again.");
+        setLoading(false);
+        toast.error("Failed to load invoices. Please try again.");
+      }
+    };
     
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      result = result.filter(invoice => invoice.status === statusFilter);
+    loadData();
+  }, [searchTerm, statusFilter, sortConfig, currentPage, itemsPerPage]);
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(totalInvoices / itemsPerPage);
+  
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) {
+      return;
     }
-    
-    // Apply search term
-    if (searchTerm) {
-      const lowercasedTerm = searchTerm.toLowerCase();
-      result = result.filter(invoice => {
-        const client = clients.find(c => c.id === invoice.clientId);
-        return (
-          invoice.invoiceNumber.toLowerCase().includes(lowercasedTerm) ||
-          (client && client.name.toLowerCase().includes(lowercasedTerm)) ||
-          (client && client.company.toLowerCase().includes(lowercasedTerm)) ||
-          invoice.status.toLowerCase().includes(lowercasedTerm)
-        );
-      });
-    }
-    
-    // Apply sorting
-    result.sort((a, b) => {
-      if (sortConfig.key === 'client') {
-        const clientA = clients.find(c => c.id === a.clientId)?.name || '';
-        const clientB = clients.find(c => c.id === b.clientId)?.name || '';
-        return sortConfig.direction === 'asc' ? clientA.localeCompare(clientB) : clientB.localeCompare(clientA);
-      }
-      
-      if (sortConfig.key === 'amount') {
-        return sortConfig.direction === 'asc' ? a.total - b.total : b.total - a.total;
-      }
-      
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-    
-    setFilteredInvoices(result);
-    setCurrentPage(1);
-  }, [invoices, searchTerm, statusFilter, sortConfig, clients]);
-  
-  // Get current invoices for pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentInvoices = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
-  
+    setCurrentPage(newPage);
+  };
+
   // Handle sort
   const handleSort = (key) => {
     let direction = 'asc';
@@ -101,13 +96,42 @@ const InvoiceList = () => {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+  
+  // Handle search
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+  
+  // Handle status filter
+  const handleStatusChange = (e) => {
+    setStatusFilter(e.target.value);
+    setCurrentPage(1); // Reset to first page when filter changes
   };
   
   // Delete invoice
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this invoice?')) {
-      setInvoices(invoices.filter(invoice => invoice.id !== id));
-      toast.success('Invoice deleted successfully!');
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this invoice?')) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      await deleteInvoice(id);
+      // Refresh the list
+      const { data, total } = await fetchInvoices({
+        status: statusFilter, sortField: sortConfig.key, sortDirection: sortConfig.direction,
+        page: currentPage, limit: itemsPerPage });
+      setInvoices(data);
+      setTotalInvoices(total);
+      toast.success('Invoice deleted successfully');
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      toast.error("Failed to delete invoice. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -127,8 +151,8 @@ const InvoiceList = () => {
   
   // Get client name
   const getClientName = (clientId) => {
-    const client = clients.find(c => c.id === clientId);
-    return client ? client.name : 'Unknown Client';
+    const client = clients.find(c => c.Id === clientId);
+    return client ? client.Name : 'Unknown Client';
   };
   
   return (
@@ -149,7 +173,7 @@ const InvoiceList = () => {
               type="text"
               placeholder="Search invoices..."
               className="input pl-10"
-              value={searchTerm}
+              value={searchTerm || ''}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
@@ -159,7 +183,7 @@ const InvoiceList = () => {
             <select
               className="input max-w-[150px]"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={handleStatusChange}
             >
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
@@ -175,7 +199,19 @@ const InvoiceList = () => {
           </div>
         ) : (
           <>
-            {filteredInvoices.length === 0 ? (
+            {error ? (
+              <div className="text-center py-20">
+                <AlertCircleIcon className="mx-auto h-12 w-12 text-red-500" />
+                <h3 className="mt-4 text-lg font-medium text-red-500">Error Loading Data</h3>
+                <p className="mt-1 text-surface-500">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="btn-primary mt-6"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : invoices.length === 0 ? (
               <div className="text-center py-20">
                 <FilePlusIcon className="mx-auto h-12 w-12 text-surface-400" />
                 <h3 className="mt-4 text-lg font-medium">No invoices found</h3>
@@ -241,11 +277,11 @@ const InvoiceList = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
-                      {currentInvoices.map((invoice) => (
-                        <tr key={invoice.id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors">
+                    {invoices.map((invoice) => (
+                      <tr key={invoice.Id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors">
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium">{invoice.invoiceNumber}</div>
-                          </td>
+                        </td> 
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="text-sm">{getClientName(invoice.clientId)}</div>
                           </td>
@@ -266,21 +302,21 @@ const InvoiceList = () => {
                           <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end space-x-2">
                               <Link
-                                to={`/invoices/${invoice.id}`}
+                              to={`/invoices/${invoice.Id}`}
                                 className="text-primary hover:text-primary-dark p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="View"
                               >
                                 <EyeIcon className="w-5 h-5" />
                               </Link>
                               <Link
-                                to={`/invoices/edit/${invoice.id}`}
+                              to={`/invoices/edit/${invoice.Id}`}
                                 className="text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200 p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="Edit"
                               >
                                 <EditIcon className="w-5 h-5" />
                               </Link>
                               <button
-                                onClick={() => handleDelete(invoice.id)}
+                              onClick={() => handleDelete(invoice.Id)}
                                 className="text-surface-600 hover:text-red-600 dark:text-surface-400 dark:hover:text-red-400 p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="Delete"
                               >
@@ -297,14 +333,14 @@ const InvoiceList = () => {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex justify-between items-center pt-5 border-t border-surface-200 dark:border-surface-700 mt-5">
-                    <div className="text-sm text-surface-500 dark:text-surface-400">
-                      Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} results
+                    <div className="text-sm text-surface-500 dark:text-surface-400"> 
+                      Showing page {currentPage} of {totalPages} ({totalInvoices} total results)
                     </div>
                     <div className="flex space-x-1">
                       <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-2 rounded-md border border-surface-200 dark:border-surface-700 disabled:opacity-50"
+                        className="p-2 rounded-md border border-surface-200 dark:border-surface-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <ArrowLeftIcon className="w-5 h-5" />
                       </button>
