@@ -45,8 +45,9 @@ export const fetchClients = async () => {
       company: client.company || '',
       email: client.email || '',
       phone: client.phone || '',
-      address: client.address || '',
+      status: client.status || 'active', // Ensure status is never undefined
       tags: client.tags || [],
+      address: client.address || '',
       lastContact: client.lastContact || new Date().toISOString().split('T')[0]
     }));
   } catch (error) {

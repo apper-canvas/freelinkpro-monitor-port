@@ -65,13 +65,13 @@ const ClientList = () => {
   const filteredClients = clients.filter(client => {
     const matchesSearch = 
       searchTerm === '' || 
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (client.name && client.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (client.company && client.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      client.phone.includes(searchTerm);
+      (client.phone && client.phone.includes(searchTerm));
       
     const matchesStatus = 
-      statusFilter === 'all' || 
+      statusFilter === 'all' ||
       client.status === statusFilter;
       
     return matchesSearch && matchesStatus;
@@ -81,6 +81,7 @@ const ClientList = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'active':
+        // Status is active
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
@@ -175,8 +176,12 @@ const ClientList = () => {
                     )}
                   </div>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(client.status)}`}>
-                    {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+                    {client.status 
+                      ? client.status.charAt(0).toUpperCase() + client.status.slice(1) 
+                      : 'Unknown'
+                    }
                   </span>
+                  
                 </div>
                 
                 <div className="space-y-2 mb-4">
