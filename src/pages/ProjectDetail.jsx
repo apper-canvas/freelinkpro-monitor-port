@@ -3,7 +3,8 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
-import { projects as initialProjects, clients } from '../utils/mockData';
+import { getProjectById, deleteProject } from '../services/projectService';
+import { fetchClients } from '../services/clientService';
 import TimeEntryForm from '../components/TimeEntryForm';
 import ExpenseForm from '../components/ExpenseForm';
 
@@ -12,6 +13,7 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [client, setClient] = useState(null);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
@@ -53,32 +55,47 @@ const ProjectDetail = () => {
   const CreditCardIcon = getIcon('CreditCard');
 
   useEffect(() => {
-    const loadProject = async () => {
+    const loadData = async () => {
       setIsLoading(true);
+      setError(null);
       try {
-        // In a real app, this would be an API fetch
-        const foundProject = initialProjects.find(p => p.id === id);
+        // Fetch project details from the API
+        const projectData = await getProjectById(id);
         
-        if (!foundProject) {
+        if (!projectData) {
+          setError('Project not found');
           toast.error('Project not found');
           navigate('/projects');
           return;
         }
         
-        setProject(foundProject);
+        // Initialize default collections if they don't exist
+        const projectWithCollections = {
+          ...projectData,
+          tasks: projectData.tasks || [],
+          timeEntries: projectData.timeEntries || [],
+          expenses: projectData.expenses || []
+        };
+        
+        setProject(projectWithCollections);
         
         // Get client information
-        const foundClient = clients.find(c => c.id === foundProject.clientId);
-        setClient(foundClient);
+        if (projectData.clientId) {
+          const clients = await fetchClients();
+          const clientData = clients.find(c => c.id === projectData.clientId);
+          setClient(clientData);
+        }
         
       } catch (error) {
-        toast.error('Failed to load project details');
+        console.error('Error loading project:', error);
+        setError('Failed to load project details');
+        toast.error('Failed to load project details. Please try again.');
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadProject();
+    loadData();
   }, [id, navigate]);
 
   useEffect(() => {
@@ -121,11 +138,17 @@ const ProjectDetail = () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       // In a real app, this would be an API call
       toast.success('Project deleted successfully');
-      navigate('/projects');
+  const handleDeleteProject = async () => {
     }
-  };
-
-  const toggleTaskStatus = (taskId) => {
+      try {
+        // Call API to delete the project
+        await deleteProject(id);
+        toast.success('Project deleted successfully');
+        navigate('/projects');
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        toast.error('Failed to delete project. Please try again.');
+      }
     const updatedTasks = project.tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
@@ -335,7 +358,7 @@ const ProjectDetail = () => {
         return <span className="tag">{status}</span>;
     }
   };
-
+  if (isLoading && !error) {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -343,11 +366,18 @@ const ProjectDetail = () => {
       </div>
     );
   }
-
+  if (error || !project) {
   if (!project) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold mb-2">Project not found</h2>
+        <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full inline-block mb-4">
+          <ChevronLeftIcon className="w-8 h-8 text-red-500" />
+        </div>
+        <h2 className="text-xl font-semibold mb-2">
+          {error || 'Project not found'}
+        </h2>
+        <Link to="/projects" className="btn-primary mt-4">
+          Back to Projects
+        </Link>
         <Link to="/projects" className="btn-primary mt-4">Back to Projects</Link>
       </div>
     );
@@ -428,7 +458,7 @@ const ProjectDetail = () => {
                 <div 
                   className="bg-primary h-2.5 rounded-full" 
                   style={{ width: `${project.progress}%` }}
-                ></div>
+                />
               </div>
               <div className="flex justify-between text-xs text-surface-500 mt-1">
                 <span>{project.progress}% Complete</span>
@@ -437,7 +467,7 @@ const ProjectDetail = () => {
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag, index) => (
+              {project.tags && project.tags.map((tag, index) => (
                 <span key={index} className="tag tag-secondary text-xs">
                   <TagIcon className="w-3 h-3 mr-1" />
                   {tag}
@@ -460,7 +490,7 @@ const ProjectDetail = () => {
             </div>
             
             <div className="space-y-2 mb-5">
-              {project.tasks.map(task => (
+              {project.tasks && project.tasks.map(task => (
                 <div 
                   key={task.id} 
                   className="flex items-center p-3 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700"
@@ -559,7 +589,7 @@ const ProjectDetail = () => {
               </div>
             </div>
 
-            {project.timeEntries && project.timeEntries.length > 0 ? (
+            {project.timeEntries?.length > 0 ? (
               <div className="space-y-2 mt-4">
                 <div className="grid grid-cols-12 text-xs font-medium text-surface-500 dark:text-surface-400 pb-2 border-b border-surface-200 dark:border-surface-700">
                   <div className="col-span-2">Date</div>
@@ -624,7 +654,7 @@ const ProjectDetail = () => {
               
               {/* Expense Summary by Category */}
               <div className="bg-surface-50 dark:bg-surface-800 p-3 rounded-lg mb-4">
-                <h4 className="text-xs font-medium text-surface-500 mb-2">EXPENSE BREAKDOWN</h4>
+                      <span>{category || 'Uncategorized'}</span>
                 <div className="space-y-2">
                   {Object.entries(getExpensesByCategory()).map(([category, amount]) => (
                     <div key={category} className="flex justify-between text-sm">
@@ -649,7 +679,7 @@ const ProjectDetail = () => {
                 </select>
               </div>
             </div>
-
+            {project.expenses?.length > 0 ? (
             {project.expenses && project.expenses.length > 0 ? (
               <div className="space-y-2 mt-4">
                 <div className="grid grid-cols-12 text-xs font-medium text-surface-500 dark:text-surface-400 pb-2 border-b border-surface-200 dark:border-surface-700">
@@ -737,7 +767,7 @@ const ProjectDetail = () => {
                 <div className="pt-4 mt-4 border-t border-surface-200 dark:border-surface-700">
                   <h4 className="text-sm font-medium mb-2">Client Tags</h4>
                   <div className="flex flex-wrap gap-2">
-                    {client.tags.map((tag, index) => (
+                    {client.tags && client.tags.map((tag, index) => (
                       <span key={index} className="tag text-xs">
                         {tag}
                       </span>

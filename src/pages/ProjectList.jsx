@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
-import { projects as initialProjects, clients } from '../utils/mockData';
+import { fetchProjects, deleteProject } from '../services/projectService';
+import { fetchClients } from '../services/clientService';
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -12,6 +13,7 @@ const ProjectList = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('dueDate');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   const navigate = useNavigate();
 
@@ -30,28 +32,42 @@ const ProjectList = () => {
 
   useEffect(() => {
     // Simulate API fetch
-    const loadProjects = async () => {
+    const loadData = async () => {
       setIsLoading(true);
+      setError(null);
       try {
-        // Enhance projects with client information
-        const projectsWithClientInfo = initialProjects.map(project => {
-          const client = clients.find(c => c.id === project.clientId);
+        // Fetch projects and clients
+        const [fetchedProjects, fetchedClients] = await Promise.all([
+          fetchProjects(),
+          fetchClients()
+        ]);
+
+        // Map client info to projects
+        const projectsWithClientInfo = fetchedProjects.map(project => {
+          // Find the associated client
+          const client = fetchedClients.find(c => c.id === project.clientId);
+          
           return {
             ...project,
             clientName: client ? client.name : 'Unknown Client',
             companyName: client ? client.company : 'Unknown Company'
           };
         });
+        
         setProjects(projectsWithClientInfo);
         setFilteredProjects(projectsWithClientInfo);
       } catch (error) {
-        toast.error('Failed to load projects');
+        console.error('Error loading projects:', error);
+        setError('Failed to load projects');
+        toast.error('Failed to load projects. Please try again.');
+        setProjects([]);
+        setFilteredProjects([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadProjects();
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -96,13 +112,22 @@ const ProjectList = () => {
     setFilteredProjects(result);
   }, [projects, searchTerm, statusFilter, sortBy]);
 
-  const handleDeleteProject = (id, event) => {
+  const handleDeleteProject = async (id, event) => {
     event.stopPropagation();
     
     if (window.confirm('Are you sure you want to delete this project?')) {
-      const updatedProjects = projects.filter(project => project.id !== id);
-      setProjects(updatedProjects);
-      toast.success('Project deleted successfully');
+      try {
+        // Call API to delete the project
+        await deleteProject(id);
+        
+        // Update local state
+        const updatedProjects = projects.filter(project => project.id !== id);
+        setProjects(updatedProjects);
+        toast.success('Project deleted successfully');
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        toast.error('Failed to delete project. Please try again.');
+      }
     }
   };
 
@@ -198,6 +223,17 @@ const ProjectList = () => {
       {isLoading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full mb-4">
+            <SearchIcon className="w-8 h-8 text-red-500" />
+          </div>
+          <h3 className="text-lg font-medium text-red-600 dark:text-red-400 mb-2">
+            Error loading projects
+          </h3>
+          <p className="text-surface-500 dark:text-surface-400 max-w-md mb-4">{error}</p>
+          <button onClick={() => window.location.reload()} className="btn-primary">Retry</button>
         </div>
       ) : filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

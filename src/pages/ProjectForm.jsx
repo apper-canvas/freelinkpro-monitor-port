@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
-import { projects, clients } from '../utils/mockData';
+import { getProjectById, createProject, updateProject } from '../services/projectService';
+import { fetchClients } from '../services/clientService';
 
 const ProjectForm = () => {
   const { id } = useParams();
@@ -11,6 +12,8 @@ const ProjectForm = () => {
   
   const [isLoading, setIsLoading] = useState(isEditing);
   const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clientsList, setClientsList] = useState([]);
   
   const initialFormState = {
     name: '',
@@ -33,12 +36,16 @@ const ProjectForm = () => {
   const PlusIcon = getIcon('Plus');
   
   useEffect(() => {
-    if (isEditing) {
-      const loadProject = async () => {
-        setIsLoading(true);
-        try {
-          // In a real app, this would be an API fetch
-          const project = projects.find(p => p.id === id);
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        // First load clients for the dropdown
+        const clients = await fetchClients();
+        setClientsList(clients);
+        
+        // If editing, load the project details
+        if (isEditing) {
+          const project = await getProjectById(id);
           
           if (!project) {
             toast.error('Project not found');
@@ -56,17 +63,38 @@ const ProjectForm = () => {
             budget: project.budget,
             tags: [...project.tags]
           });
-          
-        } catch (error) {
-          toast.error('Failed to load project details');
-        } finally {
-          setIsLoading(false);
         }
-      };
-      
-      loadProject();
-    }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        toast.error(isEditing ? 'Failed to load project details' : 'Failed to load clients');
+        if (isEditing) {
+          navigate('/projects');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadData();
   }, [id, isEditing, navigate]);
+
+  useEffect(() => {
+    // Don't run this on initial render
+    if (!isLoading && formData !== initialFormState) {
+      // Check if needed client is present, if not, try to fetch again
+      if (formData.clientId && !clientsList.some(c => c.id === formData.clientId)) {
+        const fetchMissingClients = async () => {
+          try {
+            const clients = await fetchClients();
+            setClientsList(clients);
+          } catch (error) {
+            console.error('Failed to fetch clients:', error);
+          }
+        };
+        fetchMissingClients();
+      }
+    }
+  }, [formData, clientsList, isLoading]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -115,25 +143,46 @@ const ProjectForm = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
     }
+
+    setIsSubmitting(true);
     
-    // In a real app, this would be an API call
     try {
+      // Prepare the data for submission
+      const projectData = {
+        name: formData.name,
+        description: formData.description,
+        clientId: formData.clientId,
+        startDate: formData.startDate,
+        dueDate: formData.dueDate,
+        status: formData.status,
+        budget: Number(formData.budget),
+        tags: formData.tags,
+        progress: 0  // Initialize progress to 0 for new projects
+      };
+
       if (isEditing) {
-        toast.success('Project updated successfully!');
+        // Update existing project
+        await updateProject(id, projectData);
+        toast.success('Project updated successfully');
       } else {
-        toast.success('Project created successfully!');
+        // Create new project
+        await createProject(projectData);
+        toast.success('Project created successfully');
       }
       
       navigate('/projects');
     } catch (error) {
-      toast.error(isEditing ? 'Failed to update project' : 'Failed to create project');
+      console.error('Error saving project:', error);
+      toast.error(isEditing ? 'Failed to update project. Please try again.' : 'Failed to create project. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -203,9 +252,9 @@ const ProjectForm = () => {
                 className={`input ${formErrors.clientId ? 'border-red-500 dark:border-red-500' : ''}`}
               >
                 <option value="">Select a client</option>
-                {clients.map(client => (
+                {clientsList.map(client => (
                   <option key={client.id} value={client.id}>
-                    {client.name} - {client.company}
+                    {client.name}{client.company ? ` - ${client.company}` : ''}
                   </option>
                 ))}
               </select>
@@ -325,7 +374,11 @@ const ProjectForm = () => {
           <Link to="/projects" className="btn-outline">
             Cancel
           </Link>
-          <button type="submit" className="btn-primary flex items-center gap-2">
+          <button 
+            type="submit" 
+            className="btn-primary flex items-center gap-2" 
+            disabled={isSubmitting}
+          >
             <SaveIcon className="w-4 h-4" />
             <span>{isEditing ? 'Update Project' : 'Create Project'}</span>
           </button>
