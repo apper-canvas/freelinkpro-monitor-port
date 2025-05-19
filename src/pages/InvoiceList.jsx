@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { format, parseISO } from 'date-fns';
-import { parseISO } from 'date-fns';
 import { getIcon } from '../utils/iconUtils';
 import { fetchInvoices, deleteInvoice } from '../services/invoiceService';
 import { fetchClients } from '../services/clientService';
@@ -269,19 +268,22 @@ const InvoiceList = () => {
                         >
                           <div className="flex items-center space-x-1">
                             <span>Amount</span>
+                            <SortIcon className="w-4 h-4 text-surface-400" />
+                          </div>
+                        </th>
                         <th className="px-6 py-4 whitespace-nowrap">Status</th>
                         <th className="px-6 py-4 text-right rounded-tr-lg whitespace-nowrap">Actions</th>
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Actions</th>
                       </tr>
-                      <tr key={invoice.Id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors group">
+                    </thead>
+                    <tbody className="bg-white dark:bg-surface-800 divide-y divide-surface-200/60 dark:divide-surface-700/40">
+                      {invoices.map(invoice => (
+                        <tr key={invoice.Id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors group">
                           <td className="px-6 py-5 whitespace-nowrap">
                             <div className="text-sm font-medium text-surface-800 dark:text-surface-200">{invoice.invoiceNumber}</div>
-                      <tr key={invoice.Id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors">
+                          </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <div className="text-sm text-surface-700 dark:text-surface-300">{getClientName(invoice.clientId)}</div>
-                        </td> 
+                          </td> 
                           <td className="px-6 py-5 whitespace-nowrap">
                             <div className="text-sm text-surface-600 dark:text-surface-300">{format(new Date(invoice.issueDate), 'MMM dd, yyyy')}</div>
                           </td>
@@ -293,32 +295,29 @@ const InvoiceList = () => {
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <span className={`px-3 py-1.5 text-xs font-medium rounded-full shadow-sm ${getStatusBadge(invoice.status)}`}>
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(invoice.status)}`}>
+                               {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                             </span>
+                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end space-x-1 opacity-80 group-hover:opacity-100">
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                className="text-primary hover:text-primary-dark p-2 rounded-full hover:bg-primary/10 dark:hover:bg-primary/20"
-                              <Link
-                              to={`/invoices/${invoice.Id}`}
+                              <Link 
+                                to={`/invoices/${invoice.Id}`}
                                 className="text-primary hover:text-primary-dark p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="View"
                               >
                                 <EyeIcon className="w-5 h-5" />
-                                className="text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200 p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
+                              </Link>
                               <Link
-                              to={`/invoices/edit/${invoice.Id}`}
+                                to={`/invoices/edit/${invoice.Id}`}
                                 className="text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200 p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="Edit"
                               >
                                 <EditIcon className="w-5 h-5" />
-                                className="text-surface-600 hover:text-error dark:text-surface-400 dark:hover:text-error p-2 rounded-full hover:bg-error/10 dark:hover:bg-error/20"
-
-                              onClick={() => handleDelete(invoice.Id)}
+                              </Link>
+                              <button
+                                onClick={() => handleDelete(invoice.Id)}
                                 className="text-surface-600 hover:text-red-600 dark:text-surface-400 dark:hover:text-red-400 p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
-                  <div className="flex justify-between items-center pt-6 border-t border-surface-200/60 dark:border-surface-700/40 mt-6">
+                                title="Delete"
                               >
                                 <TrashIcon className="w-5 h-5" />
                               </button>
@@ -326,14 +325,14 @@ const InvoiceList = () => {
                           </td>
                         </tr>
                       ))}
-                        className="p-2 rounded-lg border border-surface-200 dark:border-surface-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
+                    </tbody>
                   </table>
                 </div>
                 
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex justify-between items-center pt-5 border-t border-surface-200 dark:border-surface-700 mt-5">
-                        className="p-2 rounded-lg border border-surface-200 dark:border-surface-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
+                     <div>
                       Showing page {currentPage} of {totalPages} ({totalInvoices} total results)
                     </div>
                     <div className="flex space-x-1">
