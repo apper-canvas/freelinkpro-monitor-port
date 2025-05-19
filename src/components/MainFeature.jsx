@@ -229,22 +229,21 @@ const MainFeature = ({ clients, setClients }) => {
   const editClient = (clientId) => {
     setSelectedClient(clientId);
     setShowForm(true);
-        <h2 className="text-xl font-semibold gradient-text-primary">Client Management</h2>
+  };
 
   return (
-          className="btn-primary flex items-center gap-2 shadow-md"
+    <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-xl font-semibold">Client Management</h2>
         <button
           onClick={() => setShowForm(true)}
           className="btn-primary flex items-center gap-2"
         >
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <span>Add New Client</span>
         </button>
-          <input 
-      
-      <div className="flex flex-col sm:flex-row gap-4">
+      </div>
+        
+      <div className="flex flex-col sm:flex-row gap-4 mt-6">
         <div className="relative flex-1">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400" />
           <input
@@ -343,13 +342,13 @@ const MainFeature = ({ clients, setClients }) => {
                   </td>
                   <td className="px-4 py-4 hidden lg:table-cell">
                     <div className="flex flex-wrap gap-2">
-                      {client.tags && client.tags.map((tag, idx) => (
+                      {client.tags && client.tags.map((tag, idx) => {
+                        return (
                         <span key={idx} className="tag">
                           {tag}
                         </span>
-                      ))}
-                      className={`px-3 py-1 text-xs rounded-full font-medium shadow-sm
-                  </td>
+                      )})}
+                    </div>
                   <td className="px-4 py-4">
                     <span 
                       className={`px-2 py-1 text-xs rounded-full font-medium 
@@ -398,7 +397,6 @@ const MainFeature = ({ clients, setClients }) => {
                               {isDeleting ? 'Deleting...' : 'Delete'}
                             </button>
                           </div>
-                        </div>
             exit={{ opacity: 0 }} 
                     </div>
                   </td>
@@ -422,8 +420,6 @@ const MainFeature = ({ clients, setClients }) => {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              <form onSubmit={handleSubmit} className="p-6">
-                <div className="space-y-5">
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center border-b border-surface-200 dark:border-surface-700 p-4">
