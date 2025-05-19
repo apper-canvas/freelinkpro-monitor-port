@@ -157,6 +157,7 @@ const ProjectDetail = () => {
     
     setProject({ ...project, tasks: updatedTasks });
     toast.success('Task status updated');
+  };
   const addNewTask = (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
