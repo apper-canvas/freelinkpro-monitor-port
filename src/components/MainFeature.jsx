@@ -349,6 +349,7 @@ const MainFeature = ({ clients, setClients }) => {
                         </span>
                       )})}
                     </div>
+                  </td>
                   <td className="px-4 py-4">
                     <span 
                       className={`px-2 py-1 text-xs rounded-full font-medium 
@@ -394,8 +395,8 @@ const MainFeature = ({ clients, setClients }) => {
                               className={`px-2 py-1 text-xs font-medium text-white bg-accent hover:bg-accent/90 rounded ${isDeleting ? 'opacity-70 cursor-wait' : ''}`}
                               disabled={isDeleting}
                             >
-                              {isDeleting ? 'Deleting...' : 'Delete'}
                             </button>
+                    </div>
                           </div>
             exit={{ opacity: 0 }} 
                     </div>
