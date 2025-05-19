@@ -22,6 +22,8 @@ const ProjectForm = () => {
     startDate: new Date().toISOString().split('T')[0],
     dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     status: 'planning',
+    priority: 'medium',
+    category: '',
     budget: '',
     tags: []
   };
@@ -49,6 +51,16 @@ const ProjectForm = () => {
     'Web',
     'Branding',
     'Strategy'
+  ];
+
+  // Project category options
+  const categoryOptions = [
+    'Web Development',
+    'Mobile Development',
+    'Design',
+    'Marketing',
+    'Consulting',
+    'Maintenance',
   ];
   
   // Filter out already selected tags
@@ -79,6 +91,8 @@ const ProjectForm = () => {
             startDate: project.startDate,
             dueDate: project.dueDate,
             status: project.status,
+            priority: project.priority || 'medium',
+            category: project.category || '',
             budget: project.budget,
             tags: [...project.tags]
           });
@@ -168,6 +182,7 @@ const ProjectForm = () => {
       errors.dueDate = 'Due date must be after start date';
     }
     if (!formData.budget) errors.budget = 'Budget is required';
+    if (!formData.category) errors.category = 'Project category is required';
     else if (isNaN(formData.budget) || Number(formData.budget) <= 0) {
       errors.budget = 'Budget must be a positive number';
     }
@@ -195,6 +210,8 @@ const ProjectForm = () => {
         startDate: formData.startDate,
         dueDate: formData.dueDate,
         status: formData.status,
+        priority: formData.priority,
+        category: formData.category,
         budget: Number(formData.budget),
         tags: formData.tags,
         progress: 0  // Initialize progress to 0 for new projects
@@ -298,7 +315,7 @@ const ProjectForm = () => {
               </select>
               {formErrors.clientId && <p className="mt-1 text-sm text-red-500">{formErrors.clientId}</p>}
             </div>
-
+            
             <div className="space-y-1">
               <label htmlFor="status" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Status
@@ -316,6 +333,46 @@ const ProjectForm = () => {
                 <option value="completed">Completed</option>
               </select>
             </div>
+            
+            <div className="space-y-1">
+              <label htmlFor="priority" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                Priority
+              </label>
+              <select
+                id="priority"
+                name="priority"
+                value={formData.priority}
+                onChange={handleInputChange}
+                className="input"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="category" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                Category*
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                className={`input ${formErrors.category ? 'border-red-500 dark:border-red-500' : ''}`}
+              >
+                <option value="">Select a category</option>
+                {categoryOptions.map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              {formErrors.category && <p className="mt-1 text-sm text-red-500">{formErrors.category}</p>}
+            </div>
+
 
             <div className="space-y-1">
               <label htmlFor="startDate" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">

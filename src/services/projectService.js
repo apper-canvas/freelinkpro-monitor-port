@@ -23,6 +23,8 @@ export const fetchProjects = async (options = {}) => {
         'dueDate',
         'endDate',
         'budget',
+        'priority',
+        'category',
         'progress',
         'hourlyRate',
         'clientId',
@@ -53,6 +55,8 @@ export const fetchProjects = async (options = {}) => {
       dueDate: project.dueDate || '',
       endDate: project.endDate || '',
       budget: project.budget || 0,
+      priority: project.priority || 'medium',
+      category: project.category || '',
       progress: project.progress || 0,
       hourlyRate: project.hourlyRate || 0,
       clientId: project.clientId || '',
@@ -84,6 +88,8 @@ export const getProjectById = async (projectId) => {
         'dueDate',
         'endDate',
         'budget',
+        'priority',
+        'category',
         'progress',
         'hourlyRate',
         'clientId',
@@ -120,6 +126,8 @@ export const getProjectById = async (projectId) => {
       dueDate: project.dueDate || '',
       endDate: project.endDate || '',
       budget: project.budget || 0,
+      priority: project.priority || 'medium',
+      category: project.category || '',
       progress: project.progress || 0,
       hourlyRate: project.hourlyRate || 0,
       clientId: project.clientId || '',
@@ -133,15 +141,125 @@ export const getProjectById = async (projectId) => {
 
 // Create a new project
 export const createProject = async (projectData) => {
-  // Implementation here
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    const tableName = 'project1';
+    
+    // Filter out any fields that are not updateable
+    const params = {
+      records: [{
+        // Only include fields with visibility: "Updateable"
+        Name: projectData.name,
+        description: projectData.description,
+        clientId: projectData.clientId,
+        startDate: projectData.startDate,
+        dueDate: projectData.dueDate,
+        endDate: projectData.endDate || null,
+        status: projectData.status,
+        priority: projectData.priority,
+        category: projectData.category,
+        budget: projectData.budget,
+        progress: projectData.progress || 0,
+        hourlyRate: projectData.hourlyRate || 0,
+        tags: projectData.tags || []
+      }]
+    };
+
+    const response = await apperClient.createRecord(tableName, params);
+    
+    if (!response || !response.success || !response.results || !response.results[0].success) {
+      throw new Error(response?.results?.[0]?.message || 'Failed to create project');
+    }
+
+    // Return the created project
+    const createdProject = response.results[0].data;
+    return {
+      id: createdProject.Id,
+      name: createdProject.Name,
+      description: createdProject.description,
+      clientId: createdProject.clientId,
+      startDate: createdProject.startDate,
+      dueDate: createdProject.dueDate,
+      endDate: createdProject.endDate,
+      status: createdProject.status,
+      priority: createdProject.priority,
+      category: createdProject.category,
+      budget: createdProject.budget,
+      progress: createdProject.progress,
+      hourlyRate: createdProject.hourlyRate,
+      tags: createdProject.tags || []
+    };
+  } catch (error) {
+    console.error("Error creating project:", error);
+    throw error;
+  }
 };
 
 // Update an existing project
 export const updateProject = async (projectId, projectData) => {
-  // Implementation here
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    const tableName = 'project1';
+    
+    // Filter out any fields that are not updateable
+    const params = {
+      records: [{
+        // Include ID for update
+        Id: projectId,
+        // Only include fields with visibility: "Updateable"
+        Name: projectData.name,
+        description: projectData.description,
+        clientId: projectData.clientId,
+        startDate: projectData.startDate,
+        dueDate: projectData.dueDate,
+        endDate: projectData.endDate || null,
+        status: projectData.status,
+        priority: projectData.priority,
+        category: projectData.category,
+        budget: projectData.budget,
+        progress: projectData.progress !== undefined ? projectData.progress : 0,
+        hourlyRate: projectData.hourlyRate || 0,
+        tags: projectData.tags || []
+      }]
+    };
+
+    const response = await apperClient.updateRecord(tableName, params);
+    
+    if (!response || !response.success || !response.results || !response.results[0].success) {
+      throw new Error(response?.results?.[0]?.message || 'Failed to update project');
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error updating project:", error);
+    throw error;
+  }
 };
 
 // Delete a project
 export const deleteProject = async (projectId) => {
-  // Implementation here
+  try {
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    const tableName = 'project1';
+    await apperClient.deleteRecord(tableName, { RecordIds: [projectId] });
+    return true;
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    throw error;
+  }
 };

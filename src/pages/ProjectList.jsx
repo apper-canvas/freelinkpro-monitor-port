@@ -11,7 +11,9 @@ const ProjectList = () => {
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
   const [sortBy, setSortBy] = useState('dueDate');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -28,6 +30,8 @@ const ProjectList = () => {
   const ChevronLeftIcon = getIcon('ChevronLeft');
   const CalendarIcon = getIcon('Calendar');
   const DollarSignIcon = getIcon('DollarSign');
+  const FlagIcon = getIcon('Flag');
+  const FolderIcon = getIcon('Folder');
   const UsersIcon = getIcon('Users');
 
   useEffect(() => {
@@ -79,6 +83,15 @@ const ProjectList = () => {
       result = result.filter(project => project.status === statusFilter);
     }
     
+    // Apply priority filter
+    if (priorityFilter !== 'all') {
+      result = result.filter(project => project.priority === priorityFilter);
+    }
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter(project => project.category === categoryFilter);
+    }
+    
     // Apply search
     if (searchTerm) {
       const lowercasedTerm = searchTerm.toLowerCase();
@@ -87,6 +100,7 @@ const ProjectList = () => {
         project.description.toLowerCase().includes(lowercasedTerm) ||
         project.clientName.toLowerCase().includes(lowercasedTerm) ||
         project.companyName.toLowerCase().includes(lowercasedTerm) ||
+        (project.category && project.category.toLowerCase().includes(lowercasedTerm)) ||
         project.tags.some(tag => tag.toLowerCase().includes(lowercasedTerm))
       );
     }
@@ -100,6 +114,10 @@ const ProjectList = () => {
           return a.clientName.localeCompare(b.clientName);
         case 'budget':
           return b.budget - a.budget;
+        case 'priority':
+          return getPriorityWeight(b.priority) - getPriorityWeight(a.priority);
+        case 'category':
+          return a.category.localeCompare(b.category);
         case 'progress':
           return b.progress - a.progress;
         case 'dueDate':
@@ -110,7 +128,21 @@ const ProjectList = () => {
     });
     
     setFilteredProjects(result);
-  }, [projects, searchTerm, statusFilter, sortBy]);
+  }, [projects, searchTerm, statusFilter, priorityFilter, categoryFilter, sortBy]);
+
+  // Helper function to get priority weight for sorting
+  const getPriorityWeight = (priority) => {
+    switch (priority) {
+      case 'urgent':
+        return 4;
+      case 'high':
+        return 3;
+      case 'medium':
+        return 2;
+      default: // 'low'
+        return 1;
+    }
+  };
 
   const handleDeleteProject = async (id, event) => {
     event.stopPropagation();
@@ -145,6 +177,28 @@ const ProjectList = () => {
         return <span className="tag">{status}</span>;
     }
   };
+
+  const getPriorityBadge = (priority) => {
+    switch (priority) {
+      case 'urgent':
+        return <span className="tag" style={{background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444'}}>Urgent</span>;
+      case 'high':
+        return <span className="tag" style={{background: 'rgba(249, 115, 22, 0.1)', color: '#F97316'}}>High</span>;
+      case 'medium':
+        return <span className="tag" style={{background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6'}}>Medium</span>;
+      case 'low':
+        return <span className="tag" style={{background: 'rgba(16, 185, 129, 0.1)', color: '#10B981'}}>Low</span>;
+      default:
+        return <span className="tag">{priority}</span>;
+    }
+  };
+
+  // Extract unique categories for filter
+  const uniqueCategories = useMemo(() => {
+    const categories = [...new Set(projects.map(project => project.category))].filter(Boolean);
+    return categories;
+  }, [projects]);
+
 
   return (
     <div className="space-y-6">
@@ -194,7 +248,47 @@ const ProjectList = () => {
               <option value="planning">Planning</option>
               <option value="in-progress">In Progress</option>
               <option value="review">Review</option>
-              <option value="completed">Completed</option>
+              <option value="completed">Completed</option> 
+            </select>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FilterIcon className="h-5 w-5 text-surface-400" />
+            </div>
+          </div>
+
+          <div className="relative">
+            <select
+              className="input pl-9 pr-8 appearance-none bg-white dark:bg-surface-800"
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+            >
+              <option value="all">All Priorities</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FlagIcon className="h-5 w-5 text-surface-400" />
+            </div>
+          </div>
+
+          <div className="relative">
+            <select
+              className="input pl-9 pr-8 appearance-none bg-white dark:bg-surface-800"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="all">All Categories</option>
+              {uniqueCategories.map(category => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+              {uniqueCategories.length === 0 && (
+                <option disabled>
+                  No categories available
+                </option>
+              )}
             </select>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FilterIcon className="h-5 w-5 text-surface-400" />
@@ -210,8 +304,10 @@ const ProjectList = () => {
               <option value="dueDate">Due Date</option>
               <option value="name">Name</option>
               <option value="client">Client</option>
+              <option value="category">Category</option>
               <option value="budget">Budget</option>
               <option value="progress">Progress</option>
+              <option value="priority">Priority</option>
             </select>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <SortIcon className="h-5 w-5 text-surface-400" />
@@ -247,10 +343,16 @@ const ProjectList = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-lg">{project.name}</h3>
-                {getStatusBadge(project.status)}
+                <h3 className="font-semibold text-lg mb-2">{project.name}</h3>
               </div>
               
+              <div className="flex flex-wrap gap-2 mb-3">
+                {getStatusBadge(project.status)}
+                {getPriorityBadge(project.priority || 'medium')}
+                {project.category && 
+                  <span className="tag" style={{background: 'rgba(139, 92, 246, 0.1)', color: '#8B5CF6'}}>{project.category}</span>
+                }
+              </div>
               <p className="text-surface-600 dark:text-surface-400 text-sm line-clamp-2 mb-4">{project.description}</p>
               
               <div className="flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400 mb-3">
@@ -261,6 +363,11 @@ const ProjectList = () => {
               <div className="flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400 mb-3">
                 <CalendarIcon className="w-4 h-4" />
                 <span>Due: {new Date(project.dueDate).toLocaleDateString()}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400 mb-3">
+                <FolderIcon className="w-4 h-4" />
+                <span>Category: {project.category || 'Not specified'}</span>
               </div>
               
               <div className="flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400 mb-5">
