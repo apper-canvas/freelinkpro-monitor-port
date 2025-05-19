@@ -11,6 +11,9 @@ import ProjectForm from './pages/ProjectForm';
 import InvoiceList from './pages/InvoiceList';
 import InvoiceDetail from './pages/InvoiceDetail';
 import TaskList from './pages/TaskList';
+import ClientList from './pages/ClientList';
+import ClientDetail from './pages/ClientDetail';
+import ClientForm from './pages/ClientForm';
 import TaskForm from './pages/TaskForm';
 import TaskDetail from './pages/TaskDetail';
 import TimeEntryForm from './components/TimeEntryForm';
@@ -282,7 +285,9 @@ function App() {
               "/projects": <ProjectList />, "/projects/:id": <ProjectDetail />, "/projects/new": <ProjectForm />, 
               "/projects/edit/:id": <ProjectForm />, "/projects/:id/expenses": <ProjectDetail />, 
               "/projects/:id/expenses/:expenseId": <ProjectDetail />, "/invoices": <InvoiceList />, 
-              "/invoices/:id": <InvoiceDetail />, "/invoices/new": <InvoiceForm />, "/invoices/edit/:id": <InvoiceForm />,
+              "/invoices/:id": <InvoiceDetail />, "/invoices/new": <InvoiceForm />, "/invoices/edit/:id": <InvoiceForm />, 
+              "/clients": <ClientList />, "/clients/:id": <ClientDetail />, "/clients/new": <ClientForm />, 
+              "/clients/edit/:id": <ClientForm />,
               "/tasks": <TaskList />, "/tasks/:id": <TaskDetail />, "/tasks/new": <TaskForm />, "/tasks/edit/:id": <TaskForm />
             }).map(([path, element]) => (
               <Route key={path} path={path} element={<ProtectedRoute>{element}</ProtectedRoute>} />
