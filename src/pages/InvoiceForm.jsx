@@ -25,7 +25,7 @@ const InvoiceForm = () => {
     issueDate: format(new Date(), 'yyyy-MM-dd'),
     dueDate: format(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
     status: 'pending',
-    items: [{ id: `new-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
+    items: [{ id: `new-item-0`, description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
     notes: '',
     subtotal: 0,
     tax: 0,
@@ -140,13 +140,13 @@ const InvoiceForm = () => {
       // If there are existing invoices, increment the number
       if (recentInvoices && recentInvoices.length > 0) {
         const lastInvoice = recentInvoices[0];
-        if (lastInvoice.invoiceNumber) {
+        if (lastInvoice && lastInvoice.invoiceNumber) {
           const parts = lastInvoice.invoiceNumber.split('-');
           if (parts.length === 3) {
             const lastNumber = parseInt(parts[2], 10);
             if (!isNaN(lastNumber)) {
               newNumber = lastNumber + 1;
-            }
+            } 
           }
         }
       }
@@ -187,8 +187,8 @@ const InvoiceForm = () => {
     if (!initialLoaded) return;
     
     const subtotal = formData.items.reduce((sum, item) => sum + Number(item.amount), 0);
-    const tax = subtotal * 0.1; // 10% tax rate
-    const total = subtotal + tax;
+    const tax = subtotal * 0.1 || 0; // 10% tax rate
+    const total = subtotal + tax || 0;
     
     setFormData(prev => ({
       ...prev,
@@ -252,7 +252,7 @@ const InvoiceForm = () => {
       ...prev,
       items: [...prev.items, {
         // Generate a unique temporary ID for this new item
-        id: `new-item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        id: `new-item-${prev.items.length}`,
         description: '', 
         quantity: 1, 
         rate: 0, 
@@ -572,7 +572,7 @@ const InvoiceForm = () => {
           
           <div className="space-y-4">
             {formData.items.map((item, index) => (
-              <div key={item.id || item.Id || `item-${index}-${Date.now()}`} className="grid grid-cols-12 gap-4">
+              <div key={item.id || item.Id || `item-${index}`} className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 sm:col-span-6">
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                     Description
