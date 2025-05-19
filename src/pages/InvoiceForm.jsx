@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { parseISO } from 'date-fns';
 import { getIcon } from '../utils/iconUtils';
-import { getInvoiceById, createInvoice, updateInvoice } from '../services/invoiceService';
-import { fetchInvoiceItems, createInvoiceItems, deleteInvoiceItems } from '../services/invoiceItemService';
+import { getInvoiceById, createInvoice, updateInvoice, fetchInvoices } from '../services/invoiceService';
+import { fetchInvoiceItems, createInvoiceItems, deleteInvoiceItems, updateInvoiceItems } from '../services/invoiceItemService';
 import { fetchClients } from '../services/clientService';
 import { fetchProjects } from '../services/projectService';
 
@@ -25,7 +25,7 @@ const InvoiceForm = () => {
     issueDate: format(new Date(), 'yyyy-MM-dd'),
     dueDate: format(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
     status: 'pending',
-    items: [{ description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
+    items: [{ id: 'new-item-1', description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
     notes: '',
     subtotal: 0,
     tax: 0,
@@ -90,6 +90,7 @@ const InvoiceForm = () => {
           const items = invoiceItems.length > 0 
             ? invoiceItems.map(item => ({
                 Id: item.Id,
+                id: item.Id,
                 description: item.description,
                 quantity: item.quantity,
                 rate: item.rate,
@@ -171,39 +172,6 @@ const InvoiceForm = () => {
     }
   };
 
-  // Import fetchInvoices for invoice number generation
-  const fetchInvoices = async (options = {}) => {
-    try {
-      const { ApperClient } = window.ApperSDK;
-      const apperClient = new ApperClient({
-        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-      });
-
-      const params = {
-        fields: ['Id', 'invoiceNumber'],
-        orderBy: [
-          {
-            field: options.sortField || 'CreatedOn',
-            direction: options.sortDirection || 'desc'
-          }
-        ],
-        pagingInfo: {
-          limit: options.limit || 10,
-          offset: options.offset || 0
-        }
-      };
-
-      const response = await apperClient.fetchRecords('invoice1', params);
-      return {
-        data: response.data || [],
-        total: response.totalCount || 0
-      };
-    } catch (error) {
-      console.error('Error fetching invoices:', error);
-      throw error;
-    }
-  };
 
   // Filter projects when client changes
   useEffect(() => {
@@ -282,11 +250,14 @@ const InvoiceForm = () => {
   const handleAddItem = () => {
     setFormData(prev => ({
       ...prev,
-      items: [...prev.items, { 
+      items: [...prev.items, {
+        // Generate a unique temporary ID for this new item
+        id: `new-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         description: '', 
         quantity: 1, 
         rate: 0, 
         amount: 0,
+        // If we're editing an existing invoice, set its ID for the new item
         invoiceId: id || '' // Set the invoiceId for new items
       }]
     }));
@@ -601,7 +572,7 @@ const InvoiceForm = () => {
           
           <div className="space-y-4">
             {formData.items.map((item, index) => (
-              <div key={index} className="grid grid-cols-12 gap-4">
+              <div key={item.id || `item-${index}`} className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 sm:col-span-6">
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                     Description
