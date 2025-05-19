@@ -136,10 +136,6 @@ const ProjectDetail = () => {
   
   const handleDeleteProject = () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
-      // In a real app, this would be an API call
-      toast.success('Project deleted successfully');
-  const handleDeleteProject = async () => {
-    }
       try {
         // Call API to delete the project
         await deleteProject(id);
@@ -149,14 +145,19 @@ const ProjectDetail = () => {
         console.error('Error deleting project:', error);
         toast.error('Failed to delete project. Please try again.');
       }
+    }
+  };
+
+  const toggleTaskStatus = (taskId) => {
+    if (!project || !project.tasks) return;
+    
     const updatedTasks = project.tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
     
     setProject({ ...project, tasks: updatedTasks });
     toast.success('Task status updated');
-  };
-
+    const updatedTasks = project.tasks.map(task =>
   const addNewTask = (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
@@ -358,7 +359,7 @@ const ProjectDetail = () => {
         return <span className="tag">{status}</span>;
     }
   };
-  if (isLoading && !error) {
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -367,7 +368,6 @@ const ProjectDetail = () => {
     );
   }
   if (error || !project) {
-  if (!project) {
     return (
         <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full inline-block mb-4">
           <ChevronLeftIcon className="w-8 h-8 text-red-500" />
@@ -376,9 +376,6 @@ const ProjectDetail = () => {
           {error || 'Project not found'}
         </h2>
         <Link to="/projects" className="btn-primary mt-4">
-          Back to Projects
-        </Link>
-        <Link to="/projects" className="btn-primary mt-4">Back to Projects</Link>
       </div>
     );
   }
@@ -679,7 +676,6 @@ const ProjectDetail = () => {
                 </select>
               </div>
             </div>
-            {project.expenses?.length > 0 ? (
             {project.expenses && project.expenses.length > 0 ? (
               <div className="space-y-2 mt-4">
                 <div className="grid grid-cols-12 text-xs font-medium text-surface-500 dark:text-surface-400 pb-2 border-b border-surface-200 dark:border-surface-700">
