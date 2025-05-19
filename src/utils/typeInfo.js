@@ -100,4 +100,33 @@ const TypeInfo = {
   },
 };
 
+/**
+ * Generates a validation error message for missing required fields
+ * 
+ * @param {Array} missingFields - Array of field names that are missing
+ * @param {string} itemIdentifier - Optional identifier for the item (e.g., "Item 1")
+ * @returns {string} - Formatted error message
+ */
+export const generateValidationErrorMessage = (missingFields, itemIdentifier = '') => {
+  if (!missingFields || missingFields.length === 0) {
+    return 'Validation failed. Please check the form and try again.';
+  }
+  
+  const fieldList = missingFields.join(', ');
+  const fieldsText = missingFields.length > 1 ? 'fields' : 'field';
+  
+  if (itemIdentifier) {
+    return `${itemIdentifier} ${fieldsText} ${fieldList} are required`;
+  }
+  
+  return `${fieldsText.charAt(0).toUpperCase() + fieldsText.slice(1)} ${fieldList} are required`;
+};
+
+/**
+ * Checks if a value is empty or undefined
+ * @param {any} value - The value to check
+ * @returns {boolean} - True if the value is empty
+ */
+export const isEmpty = (value) => value === null || value === undefined || value === '';
+
 export default TypeInfo;

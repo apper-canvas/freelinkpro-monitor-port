@@ -8,6 +8,7 @@ import { getInvoiceById, createInvoice, updateInvoice, fetchInvoices } from '../
 import { fetchInvoiceItems, createInvoiceItems, deleteInvoiceItems, updateInvoiceItems } from '../services/invoiceItemService';
 import { fetchClients } from '../services/clientService';
 import { fetchProjects } from '../services/projectService';
+import { generateValidationErrorMessage, isEmpty } from '../utils/typeInfo';
 
 const InvoiceForm = () => {
   const { id } = useParams();
@@ -294,12 +295,37 @@ const InvoiceForm = () => {
       return;
     }
     
-    const hasInvalidItem = formData.items.some(item => 
-      !item.description || item.quantity <= 0 || item.rate <= 0
-    );
+    // More detailed validation for items
+    const invalidItems = formData.items.map((item, index) => {
+      const missingFields = [];
+      
+      if (isEmpty(item.description)) {
+        missingFields.push('description');
+      }
+      
+      if (!item.quantity || item.quantity <= 0) {
+        missingFields.push('quantity');
+      }
+      
+      if (!item.rate || item.rate <= 0) {
+        missingFields.push('rate');
+      }
+      
+      return {
+        index,
+        missingFields
+      };
+    }).filter(item => item.missingFields.length > 0);
     
-    if (hasInvalidItem) {
-      toast.error('All items must have a description, quantity, and rate');
+    if (invalidItems.length > 0) {
+      // Generate error messages for each invalid item
+      const firstInvalidItem = invalidItems[0];
+      const itemNumber = firstInvalidItem.index + 1;
+      const errorMessage = generateValidationErrorMessage(
+        firstInvalidItem.missingFields,
+        `Item ${itemNumber}`
+      );
+      toast.error(errorMessage);
       return;
     }
     
