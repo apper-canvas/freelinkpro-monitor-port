@@ -32,6 +32,7 @@ const ClientList = () => {
     try {
       const data = await fetchClients();
       setClients(data);
+      
     } catch (error) {
       console.error('Error loading clients:', error);
       toast.error('Failed to load clients');
@@ -50,7 +51,12 @@ const ClientList = () => {
     
     setIsDeleting(true);
     try {
-      await deleteClient(clientToDelete.id);
+      // Ensure we have the correct id format
+      const clientId = clientToDelete?.id || clientToDelete?.Id;
+      if (!clientId) {
+        throw new Error('Invalid client ID');
+      }
+      await deleteClient(clientId);
       setClients(clients.filter(client => client.id !== clientToDelete.id));
       toast.success('Client deleted successfully');
       setShowDeleteModal(false);
@@ -65,12 +71,12 @@ const ClientList = () => {
   // Filter clients based on search term and status
   const filteredClients = clients.filter(client => {
     const matchesSearch = 
-      searchTerm === '' || 
-      (client.name && client.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (client.company && client.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (client.phone && client.phone.includes(searchTerm));
-      
+      !searchTerm || 
+      (client?.name && client.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (client?.company && client.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (client?.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (client?.phone && client.phone.includes(searchTerm));
+    
     const matchesStatus = 
       statusFilter === 'all' ||
       client.status === statusFilter;
@@ -163,12 +169,12 @@ const ClientList = () => {
       ) : (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredClients.map((client) => (
-            <div key={client.id} className="card hover:shadow-lg transition-shadow duration-200">
+            <div key={client.id || `client-${Math.random()}`} className="card hover:shadow-lg transition-shadow duration-200">
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <Link to={`/clients/${client.id}`} className="text-lg font-semibold text-surface-800 dark:text-surface-100 hover:text-primary">
-                      {client.name}
+                      {client.name || 'Unnamed Client'}
                     </Link>
                     {client.company && (
                       <div className="text-surface-600 dark:text-surface-300 text-sm mt-1">
@@ -241,7 +247,7 @@ const ClientList = () => {
               <h3 className="text-lg font-semibold text-surface-800 dark:text-surface-100">Confirm Deletion</h3>
             </div>
             <p className="text-surface-600 dark:text-surface-300 mb-4">
-              Are you sure you want to delete <span className="font-medium text-surface-800 dark:text-surface-100">{clientToDelete.name}</span>? 
+              Are you sure you want to delete <span className="font-medium text-surface-800 dark:text-surface-100">{clientToDelete?.name || 'this client'}</span>? 
               This action cannot be undone and will remove all client data.
             </p>
             <div className="flex justify-end gap-3 mt-6">
