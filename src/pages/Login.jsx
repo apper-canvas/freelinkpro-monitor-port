@@ -9,8 +9,10 @@ function Login() {
   useEffect(() => {
     if (isInitialized) {
       // Show login UI in this component
-      const { ApperUI } = window.ApperSDK;
-      ApperUI.showLogin("#authentication");
+      if (window.ApperSDK) {
+        const { ApperUI } = window.ApperSDK;
+        ApperUI.showLogin("#authentication");
+      }
     }
   }, [isInitialized]);
 

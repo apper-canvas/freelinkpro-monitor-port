@@ -260,6 +260,9 @@ function App() {
           </div>
         </header>
         
+        {/* Authentication container - only displayed when needed */}
+        <div id="authentication" className={!['/login', '/signup', '/callback'].includes(window.location.pathname) ? 'hidden' : ''}></div>
+        
         <div className="flex min-h-[calc(100vh-69px)]">
           {/* Conditionally render sidebar only for authenticated users and not on auth pages */}
           {isAuthenticated && !['/login', '/signup', '/callback', '/error'].includes(window.location.pathname) && (
@@ -303,8 +306,6 @@ function App() {
             </Routes>
           </main>
         </div>
-
-        <div id="authentication" style={{ display: 'none' }}></div>
 
         <footer className="bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 py-6">
           <div className="container mx-auto px-4 text-center text-surface-500">
