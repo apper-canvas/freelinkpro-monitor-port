@@ -24,6 +24,7 @@ import Signup from './pages/Signup';
 import Callback from './pages/Callback';
 import ErrorPage from './pages/ErrorPage';
 import { setUser, clearUser } from './store/userSlice';
+import Sidebar from './components/Sidebar';
 
 // Create auth context
 export const AuthContext = createContext(null);
@@ -206,7 +207,7 @@ function App() {
   return (
     <AuthContext.Provider value={authMethods}>
       <div className="min-h-screen">
-        <header className="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-10">
+        <header className="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-20">
           <div className="container mx-auto px-4 py-3 flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <div className="bg-primary rounded-lg w-8 h-8 flex items-center justify-center">
@@ -258,43 +259,50 @@ function App() {
             </div>
           </div>
         </header>
-
-        <main className="container mx-auto px-4 py-6">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/callback" element={<Callback />} />
-            <Route path="/error" element={<ErrorPage />} />
-            
-            {/* Protected routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            
-            } />
-            {/* Add ProtectedRoute to all other routes */}
-            {Object.entries({
-              "/projects": <ProjectList />, "/projects/:id": <ProjectDetail />, "/projects/new": <ProjectForm />, 
-              "/projects/edit/:id": <ProjectForm />, "/projects/:id/expenses": <ProjectDetail />, 
-              "/projects/:id/expenses/:expenseId": <ProjectDetail />, "/invoices": <InvoiceList />, 
-              "/invoices/:id": <InvoiceDetail />, "/invoices/new": <InvoiceForm />, "/invoices/edit/:id": <InvoiceForm />, 
-              "/clients": <ClientList />, "/clients/:id": <ClientDetail />, "/clients/new": <ClientForm />, 
-              "/clients/edit/:id": <ClientForm />,
-              "/tasks": <TaskList />, "/tasks/:id": <TaskDetail />, "/tasks/new": <TaskForm />, "/tasks/edit/:id": <TaskForm />
-            }).map(([path, element]) => (
-              <Route key={path} path={path} element={<ProtectedRoute>{element}</ProtectedRoute>} />
-            ))}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
+        
+        <div className="flex min-h-[calc(100vh-69px)]">
+          {/* Conditionally render sidebar only for authenticated users and not on auth pages */}
+          {isAuthenticated && !['/login', '/signup', '/callback', '/error'].includes(window.location.pathname) && (
+            <Sidebar />
+          )}
+          
+          <main className="flex-1 container mx-auto px-4 py-6">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/callback" element={<Callback />} />
+              <Route path="/error" element={<ErrorPage />} />
+              
+              {/* Protected routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              
+              } />
+              {/* Add ProtectedRoute to all other routes */}
+              {Object.entries({
+                "/projects": <ProjectList />, "/projects/:id": <ProjectDetail />, "/projects/new": <ProjectForm />, 
+                "/projects/edit/:id": <ProjectForm />, "/projects/:id/expenses": <ProjectDetail />, 
+                "/projects/:id/expenses/:expenseId": <ProjectDetail />, "/invoices": <InvoiceList />, 
+                "/invoices/:id": <InvoiceDetail />, "/invoices/new": <InvoiceForm />, "/invoices/edit/:id": <InvoiceForm />, 
+                "/clients": <ClientList />, "/clients/:id": <ClientDetail />, "/clients/new": <ClientForm />, 
+                "/clients/edit/:id": <ClientForm />,
+                "/tasks": <TaskList />, "/tasks/:id": <TaskDetail />, "/tasks/new": <TaskForm />, "/tasks/edit/:id": <TaskForm />
+              }).map(([path, element]) => (
+                <Route key={path} path={path} element={<ProtectedRoute>{element}</ProtectedRoute>} />
+              ))}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </div>
 
         <div id="authentication" style={{ display: 'none' }}></div>
 
