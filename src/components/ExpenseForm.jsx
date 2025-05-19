@@ -122,9 +122,9 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-surface-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-4 border-b border-surface-200 dark:border-surface-700">
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/40 dark:bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-surface-200/60 dark:border-surface-700/40">
+        <div className="flex justify-between items-center p-5 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/70 rounded-t-xl">
           <h2 className="text-lg font-semibold">
             {initialData ? 'Edit Expense' : 'Add New Expense'}
           </h2>
@@ -201,7 +201,7 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
             {formErrors.category && <p className="mt-1 text-sm text-red-500">{formErrors.category}</p>}
           </div>
           
-          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
             <label htmlFor="description" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
               Description*
             </label>
@@ -225,7 +225,7 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
           <div className="space-y-2">
             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
               Receipt
-            </label>
+            </label> 
             
             {hasReceipt ? (
               <div className="flex items-center justify-between p-2 border border-surface-200 dark:border-surface-700 rounded-lg">
@@ -244,10 +244,10 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-center p-4 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-lg">
+              <div className="flex items-center justify-center p-6 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors">
                 <label className="cursor-pointer flex flex-col items-center">
-                  <ReceiptIcon className="h-6 w-6 text-surface-400 mb-2" />
-                  <span className="text-sm text-surface-500 dark:text-surface-400">Click to attach receipt</span>
+                  <ReceiptIcon className="h-8 w-8 text-surface-400 mb-3" />
+                  <span className="text-sm text-surface-500 dark:text-surface-400">Click to attach receipt</span> 
                   <input
                     type="file"
                     name="receipt"
@@ -264,7 +264,7 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
             <div className="flex items-center">
               <input
                 type="checkbox"
-                id="billable"
+                id="billable" 
                 name="billable"
                 checked={formData.billable}
                 onChange={handleChange}
@@ -290,16 +290,16 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
             </div>
           </div>
           
-          <div className="pt-4 border-t border-surface-200 dark:border-surface-700 mt-4 flex justify-end gap-2">
+          <div className="pt-4 border-t border-surface-200 dark:border-surface-700 mt-6 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               className="btn-outline"
-            >
+            > 
               Cancel
             </button>
             <button
-              type="submit"
+              type="submit" 
               className="btn-primary"
             >
               {initialData ? 'Update Expense' : 'Add Expense'}
@@ -310,5 +310,5 @@ const ExpenseForm = ({ isOpen, onClose, onSubmit, initialData, projectId }) => {
     </div>
   );
 };
-
+  
 export default ExpenseForm;

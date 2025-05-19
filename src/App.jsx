@@ -207,41 +207,44 @@ function App() {
   return (
     <AuthContext.Provider value={authMethods}>
       <div className="min-h-screen">
-        <header className="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-20">
-          <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <header className="bg-white/90 dark:bg-surface-800/90 backdrop-blur-sm border-b border-surface-200 dark:border-surface-700/60 sticky top-0 z-20">
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <div className="bg-primary rounded-lg w-8 h-8 flex items-center justify-center">
-                <span className="text-white font-bold">F</span>
+              <div className="bg-gradient-primary shadow-md rounded-lg w-10 h-10 flex items-center justify-center">
+                <span className="text-white font-bold text-xl">F</span>
               </div>
-              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-xl md:text-2xl font-bold gradient-text bg-gradient-to-r from-primary to-secondary">
                 FreeLinkPro
               </h1>
             </div>
 
             <div className="flex items-center gap-3">
               {isAuthenticated && (
-                <div className="flex items-center gap-3 mr-2">
-                  <div className="hidden md:flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                      <UserIcon className="w-4 h-4 text-primary" />
+                <div className="flex items-center gap-3 mr-3">
+                  <div className="hidden md:flex items-center gap-3">
+                    <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-surface-100/80 dark:bg-surface-700/60 border border-surface-200/60 dark:border-surface-600/30">
+                      <div className="w-7 h-7 rounded-full bg-gradient-primary shadow-sm flex items-center justify-center">
+                        <UserIcon className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="text-sm font-medium">
+                        {userState?.user?.firstName || 'User'}
+                      </div>
                     </div>
-                    <div className="text-sm font-medium">
-                      {userState?.user?.firstName || 'User'}
-                    </div>
+                    <button
+                      onClick={authMethods.logout}
+                      className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 hover:text-accent transition-colors"
+                      title="Log out"
+                    >
+                      <LogOutIcon className="w-5 h-5" />
+                    </button>
                   </div>
-                  <button
-                    onClick={authMethods.logout}
-                    className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 hover:text-accent"
-                    title="Log out"
-                  >
-                    <LogOutIcon className="w-5 h-5" />
-                  </button>
                 </div>
               )}
               
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-full bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors"
+                className="p-2.5 rounded-full bg-surface-100/80 dark:bg-surface-700/60 hover:bg-surface-200 dark:hover:bg-surface-600 
+                border border-surface-200/60 dark:border-surface-600/30 shadow-sm transition-colors"
                 aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
               >
                 <motion.div
@@ -250,7 +253,7 @@ function App() {
                   transition={{ duration: 0.5 }}
                 >
                   {darkMode ? (
-                    <SunIcon className="w-5 h-5 text-yellow-400" />
+                    <SunIcon className="w-5 h-5 text-amber-400" />
                   ) : (
                     <MoonIcon className="w-5 h-5 text-surface-600" />
                   )}
@@ -263,13 +266,13 @@ function App() {
         {/* Authentication container - only displayed when needed */}
         <div id="authentication" className={!['/login', '/signup', '/callback'].includes(window.location.pathname) ? 'hidden' : ''}></div>
         
-        <div className="flex min-h-[calc(100vh-69px)]">
+        <div className="flex min-h-[calc(100vh-73px)]">
           {/* Conditionally render sidebar only for authenticated users and not on auth pages */}
           {isAuthenticated && !['/login', '/signup', '/callback', '/error'].includes(window.location.pathname) && (
             <Sidebar />
           )}
           
-          <main className="flex-1 container mx-auto px-4 py-6">
+          <main className="flex-1 container mx-auto px-4 py-6 bg-pattern">
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
@@ -307,9 +310,9 @@ function App() {
           </main>
         </div>
 
-        <footer className="bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 py-6">
-          <div className="container mx-auto px-4 text-center text-surface-500">
-            <p>&copy; {new Date().getFullYear()} FreeLinkPro. All rights reserved.</p>
+        <footer className="bg-white dark:bg-surface-800 border-t border-surface-200/60 dark:border-surface-700/40 py-6">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-surface-500 dark:text-surface-400">&copy; {new Date().getFullYear()} FreeLinkPro. All rights reserved.</p>
           </div>
         </footer>
 

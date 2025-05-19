@@ -90,13 +90,12 @@ const ClientList = () => {
   // Get status badge class
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'active':
-        // Status is active
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'active': 
+        return 'bg-success/10 text-success dark:bg-success/20 dark:text-success/90';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'inactive':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning/90';
+      case 'inactive': 
+        return 'bg-error/10 text-error dark:bg-error/20 dark:text-error/90';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -105,7 +104,7 @@ const ClientList = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary border-t-transparent shadow-lg"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-r-2 border-primary shadow-lg"></div>
       </div>
     );
   }
@@ -113,8 +112,8 @@ const ClientList = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-surface-800 dark:text-surface-100">Clients</h1>
-        <Link to="/clients/new" className="btn-primary flex items-center gap-2">
+        <h1 className="text-2xl font-bold gradient-text bg-gradient-to-r from-primary to-secondary">Clients</h1>
+        <Link to="/clients/new" className="btn-primary flex items-center gap-2 shadow-md">
           <PlusIcon className="w-4 h-4" />
           <span>Add Client</span>
         </Link>
@@ -157,9 +156,9 @@ const ClientList = () => {
 
       {/* Clients list */}
       {filteredClients.length === 0 ? (
-        <div className="text-center py-12 card">
+        <div className="text-center py-16 card">
           <UserIcon className="w-12 h-12 mx-auto text-surface-400 dark:text-surface-500 mb-4" />
-          <h3 className="text-lg font-medium text-surface-600 dark:text-surface-300 mb-2">No clients found</h3>
+          <h3 className="text-xl font-semibold text-surface-700 dark:text-surface-300 mb-2">No clients found</h3>
           <p className="text-surface-500 dark:text-surface-400 mb-6">
             {searchTerm || statusFilter !== 'all'
               ? 'Try adjusting your search filters'
@@ -172,11 +171,11 @@ const ClientList = () => {
       ) : (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredClients.map((client) => (
-            <div key={client.id || `client-${Math.random()}`} className="card hover:shadow-lg transition-shadow duration-200">
+            <div key={client.id || `client-${Math.random()}`} className="card card-hover bg-white/90 dark:bg-surface-800/90">
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <Link to={`/clients/${client.id}`} className="text-lg font-semibold text-surface-800 dark:text-surface-100 hover:text-primary">
+                    <Link to={`/clients/${client.id}`} className="text-lg font-semibold text-surface-800 dark:text-surface-100 hover:text-primary transition-colors">
                       {client.name || 'Unnamed Client'}
                     </Link>
                     {client.company && (
@@ -185,12 +184,12 @@ const ClientList = () => {
                       </div>
                     )}
                   </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(client.status)}`}>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium shadow-sm ${getStatusBadge(client.status)}`}>
                     {client.status 
-                      ? client.status.charAt(0).toUpperCase() + client.status.slice(1) 
-                      : 'Unknown'
+                        ? client.status.charAt(0).toUpperCase() + client.status.slice(1) 
+                        : 'Unknown'
                     }
-                  </span>
+                  </span>                  
                   
                 </div>
                 
@@ -215,21 +214,21 @@ const ClientList = () => {
                 
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2">
-                    <Link to={`/clients/edit/${client.id}`} className="p-1.5 rounded-md text-surface-500 hover:text-primary hover:bg-surface-100 dark:hover:bg-surface-700">
+                    <Link to={`/clients/edit/${client.id}`} className="p-2 rounded-md text-surface-500 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
                       <EditIcon className="w-4 h-4" />
                     </Link>
                     <button 
                       onClick={() => confirmDelete(client)}
-                      className="p-1.5 rounded-md text-surface-500 hover:text-red-500 hover:bg-surface-100 dark:hover:bg-surface-700"
+                      className="p-2 rounded-md text-surface-500 hover:text-error hover:bg-error/10 dark:hover:bg-error/20 transition-colors"
                     >
                       <TrashIcon className="w-4 h-4" />
                     </button>
                   </div>
                   <Link 
                     to={`/clients/${client.id}`}
-                    className="inline-flex items-center text-sm text-primary hover:text-primary-dark"
+                    className="inline-flex items-center text-sm text-primary hover:text-primary-dark px-3 py-1 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors"
                   >
-                    <span className="mr-1">Details</span>
+                    <span className="mr-1 font-medium">Details</span>
                     <ChevronRightIcon className="w-4 h-4" />
                   </Link>
                 </div>
@@ -242,10 +241,10 @@ const ClientList = () => {
       {/* Delete confirmation modal */}
       {showDeleteModal && clientToDelete && (
         <div className="fixed inset-0 bg-surface-900/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-surface-800 rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full p-6 border border-surface-200/60 dark:border-surface-700/40">
             <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-full bg-red-100 dark:bg-red-900/50 p-2">
-                <XCircleIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+              <div className="rounded-full bg-error/10 dark:bg-error/20 p-2">
+                <XCircleIcon className="w-6 h-6 text-error" />
               </div>
               <h3 className="text-lg font-semibold text-surface-800 dark:text-surface-100">Confirm Deletion</h3>
             </div>

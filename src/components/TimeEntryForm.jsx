@@ -132,14 +132,14 @@ const TimeEntryForm = ({ isOpen, onClose, onSubmit, initialData = null, projectI
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/40 dark:bg-black/60">
       <motion.div 
-        className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full"
+        className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full border border-surface-200/60 dark:border-surface-700/40"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
       >
-        <div className="flex justify-between items-center p-5 border-b border-surface-200 dark:border-surface-700">
+        <div className="flex justify-between items-center p-5 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/70 rounded-t-xl">
           <h2 className="text-xl font-semibold">
             {isEditing ? 'Edit Time Entry' : 'Add Time Entry'}
           </h2>
@@ -151,7 +151,7 @@ const TimeEntryForm = ({ isOpen, onClose, onSubmit, initialData = null, projectI
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
             <label htmlFor="date" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Date*</label>
-            <div className="relative">
+            <div className="relative group">
               <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-500" size={18} />
               <input type="date" id="date" name="date" value={formData.date} onChange={handleChange} 
                 className={`input pl-10 ${formErrors.date ? 'border-red-500' : ''}`} />
@@ -161,7 +161,7 @@ const TimeEntryForm = ({ isOpen, onClose, onSubmit, initialData = null, projectI
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="startTime" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Start Time*</label>
+              <label htmlFor="startTime" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Start*</label>
               <div className="relative">
                 <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-500" size={18} />
                 <input type="time" id="startTime" name="startTime" value={formData.startTime} onChange={handleChange} 
@@ -171,7 +171,7 @@ const TimeEntryForm = ({ isOpen, onClose, onSubmit, initialData = null, projectI
             </div>
             
             <div>
-              <label htmlFor="endTime" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">End Time*</label>
+              <label htmlFor="endTime" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">End*</label>
               <div className="relative">
                 <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-500" size={18} />
                 <input type="time" id="endTime" name="endTime" value={formData.endTime} onChange={handleChange} 
@@ -182,32 +182,36 @@ const TimeEntryForm = ({ isOpen, onClose, onSubmit, initialData = null, projectI
           </div>
           
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description*</label>
+            <label htmlFor="description" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+              Description*
+            </label>
             <div className="relative">
               <FileTextIcon className="absolute left-3 top-3 text-surface-500" size={18} />
               <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={3}
-                className={`input pl-10 ${formErrors.description ? 'border-red-500' : ''}`} 
+                className={`input pl-10 ${formErrors.description ? 'border-red-500' : ''}`}
                 placeholder="What did you work on?"></textarea>
             </div>
             {formErrors.description && <p className="mt-1 text-sm text-red-500">{formErrors.description}</p>}
           </div>
           
           <div>
-            <label htmlFor="duration" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Duration (hours)</label>
+            <label htmlFor="duration" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+              Duration (hours)
+            </label>
             <input type="number" id="duration" name="duration" value={formData.duration} onChange={handleChange} 
-              className="input" step="0.25" min="0.25" />
+              className="input shadow-sm" step="0.25" min="0.25" />
             {isCalculatingDuration && <p className="mt-1 text-xs text-surface-500">Calculating...</p>}
           </div>
           
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-4 mt-2">
             <button type="button" onClick={onClose} className="btn-outline">Cancel</button>
-            <button type="submit" className="btn-primary flex items-center gap-2">
+            <button type="submit" className="btn-primary flex items-center gap-2 px-6">
               <SaveIcon className="w-4 h-4" />
               <span>{isEditing ? 'Update' : 'Save'}</span>
             </button>
           </div>
         </form>
-      </motion.div>
+      </motion.div> 
     </div>
   );
 };

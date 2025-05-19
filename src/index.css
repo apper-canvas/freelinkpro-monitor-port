@@ -7,7 +7,7 @@
 
 @layer base {
   body {
-    @apply antialiased text-surface-800 dark:text-surface-100 bg-surface-50 dark:bg-surface-900 
+    @apply antialiased text-surface-800 dark:text-surface-100 bg-surface-50 dark:bg-surface-950 
     min-h-screen transition-colors duration-200;
   }
   
@@ -34,8 +34,8 @@
 
 @layer components {
   .card {
-    @apply bg-white dark:bg-surface-800 rounded-xl shadow-card dark:shadow-none 
-    border border-surface-200 dark:border-surface-700 overflow-hidden
+    @apply bg-white dark:bg-surface-800 rounded-xl shadow-card dark:shadow-soft
+    border border-surface-200/60 dark:border-surface-700/40 overflow-hidden
     transition-all duration-200;
   }
   
@@ -45,14 +45,30 @@
   }
   
   .btn-primary {
-    @apply btn bg-primary hover:bg-primary-dark text-white
+    @apply btn bg-gradient-primary hover:shadow-md hover:translate-y-[-1px] text-white
     focus:ring-primary/50;
   }
   
   .btn-secondary {
-    @apply btn bg-secondary hover:bg-secondary-dark text-white
+    @apply btn bg-gradient-secondary hover:shadow-md hover:translate-y-[-1px] text-white
     focus:ring-secondary/50;
   }
+
+  .btn-accent {
+    @apply btn bg-gradient-accent hover:shadow-md hover:translate-y-[-1px] text-white
+    focus:ring-accent/50;
+  }
+
+  .btn-success {
+    @apply btn bg-gradient-success hover:shadow-md hover:translate-y-[-1px] text-white
+    focus:ring-success/50;
+  }
+
+  .btn-error {
+    @apply btn bg-gradient-error hover:shadow-md hover:translate-y-[-1px] text-white
+    focus:ring-error/50;
+  }
+
   
   .btn-outline {
     @apply btn border border-surface-300 dark:border-surface-600 
@@ -61,8 +77,8 @@
   }
   
   .input {
-    @apply w-full px-4 py-2 rounded-lg border border-surface-300 dark:border-surface-600
-    bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100
+    @apply w-full px-4 py-2 rounded-lg border border-surface-300/70 dark:border-surface-600/70
+    bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 shadow-sm
     focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
     placeholder:text-surface-400 dark:placeholder:text-surface-500
     disabled:bg-surface-100 dark:disabled:bg-surface-700 disabled:cursor-not-allowed
@@ -70,16 +86,71 @@
   }
 
   .tag {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
     bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light;
   }
 
   .tag-secondary {
-    @apply bg-secondary/10 text-secondary dark:bg-secondary/20 dark:text-secondary-light;
+    @apply tag bg-secondary/10 text-secondary dark:bg-secondary/20 dark:text-secondary-light;
   }
 
   .tag-accent {
-    @apply bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent;
+    @apply tag bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent-light;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+  }
+
+  .gradient-text-primary {
+    @apply gradient-text bg-gradient-primary;
+  }
+
+  .gradient-text-secondary {
+    @apply gradient-text bg-gradient-secondary;
+  }
+
+  .gradient-text-accent {
+    @apply gradient-text bg-gradient-accent;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-lg hover:translate-y-[-2px] transition-all duration-200;
+  }
+  
+  .card-stats {
+    @apply relative card p-5 overflow-hidden card-hover border-0;
+  }
+  
+  .card-stats-primary {
+    @apply card-stats bg-gradient-primary text-white;
+  }
+  
+  .card-stats-secondary {
+    @apply card-stats bg-gradient-secondary text-white;
+  }
+  
+  .card-stats-accent {
+    @apply card-stats bg-gradient-accent text-white;
+  }
+  
+  .card-stats-success {
+    @apply card-stats bg-gradient-success text-white;
+  }
+  
+  .card-stats-warning {
+    @apply card-stats bg-gradient-warning text-white;
+  }
+  
+  .card-stats-error {
+    @apply card-stats bg-gradient-error text-white;
+  }
+  
+  .glow-effect {
+    @apply relative;
+  }
+  .glow-effect::after {
+    @apply content-[''] absolute inset-0 rounded-xl bg-gradient-primary opacity-0 transition-opacity duration-300 pointer-events-none;
   }
 }
 

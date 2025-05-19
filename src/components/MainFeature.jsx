@@ -229,20 +229,20 @@ const MainFeature = ({ clients, setClients }) => {
   const editClient = (clientId) => {
     setSelectedClient(clientId);
     setShowForm(true);
-  };
+        <h2 className="text-xl font-semibold gradient-text-primary">Client Management</h2>
 
   return (
-    <div className="space-y-6">
+          className="btn-primary flex items-center gap-2 shadow-md"
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-xl font-semibold">Client Management</h2>
         <button
           onClick={() => setShowForm(true)}
           className="btn-primary flex items-center gap-2"
         >
-          <PlusIcon className="w-5 h-5" />
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <span>Add New Client</span>
         </button>
-      </div>
+          <input 
       
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -302,13 +302,13 @@ const MainFeature = ({ clients, setClients }) => {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 text-sm">
+          <table className="w-full border-collapse">
+            <thead className="bg-surface-50 dark:bg-surface-800/50 text-surface-600 dark:text-surface-300 text-sm rounded-lg overflow-hidden">
               <tr>
-                <th className="px-4 py-3 text-left font-medium">Client</th>
-                <th className="px-4 py-3 text-left font-medium hidden md:table-cell">Contact</th>
-                <th className="px-4 py-3 text-left font-medium hidden lg:table-cell">Tags</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
+                <th className="px-6 py-4 text-left font-medium rounded-l-lg">Client</th>
+                <th className="px-6 py-4 text-left font-medium hidden md:table-cell">Contact</th>
+                <th className="px-6 py-4 text-left font-medium hidden lg:table-cell">Tags</th>
+                <th className="px-6 py-4 text-left font-medium">Status</th>
                 <th className="px-4 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
@@ -316,13 +316,13 @@ const MainFeature = ({ clients, setClients }) => {
               {filteredClients.map(client => (
                 <tr 
                   key={client.id} 
-                  className="bg-white dark:bg-surface-800 hover:bg-surface-50 dark:hover:bg-surface-750 transition-colors"
+                  className="bg-white dark:bg-surface-800 hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors"
                 >
-                  <td className="px-4 py-4">
+                  <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0">
-                        <span className="text-primary font-medium">{client.name.charAt(0)}</span>
-                      </div>
+                      <div className="w-11 h-11 rounded-full bg-gradient-primary shadow-sm flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-medium">{client.name.charAt(0)}</span>
+                      </div> 
                       <div>
                         <div className="font-medium text-surface-800 dark:text-surface-100">{client.name}</div>
                         <div className="text-sm text-surface-500 dark:text-surface-400">{client.company}</div>
@@ -348,7 +348,7 @@ const MainFeature = ({ clients, setClients }) => {
                           {tag}
                         </span>
                       ))}
-                    </div>
+                      className={`px-3 py-1 text-xs rounded-full font-medium shadow-sm
                   </td>
                   <td className="px-4 py-4">
                     <span 
@@ -399,7 +399,7 @@ const MainFeature = ({ clients, setClients }) => {
                             </button>
                           </div>
                         </div>
-                      )}
+            exit={{ opacity: 0 }} 
                     </div>
                   </td>
                 </tr>
@@ -422,8 +422,8 @@ const MainFeature = ({ clients, setClients }) => {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+              <form onSubmit={handleSubmit} className="p-6">
+                <div className="space-y-5">
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center border-b border-surface-200 dark:border-surface-700 p-4">

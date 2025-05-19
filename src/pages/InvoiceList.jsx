@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { parseISO } from 'date-fns';
 import { getIcon } from '../utils/iconUtils';
 import { fetchInvoices, deleteInvoice } from '../services/invoiceService';
@@ -139,11 +139,11 @@ const InvoiceList = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'paid':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success/10 text-success dark:bg-success/20 dark:text-success/90';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning/90';
       case 'overdue':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        return 'bg-error/10 text-error dark:bg-error/20 dark:text-error/90';
       default:
         return 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300';
     }
@@ -159,12 +159,12 @@ const InvoiceList = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Invoices</h1>
-        <Link to="/invoices/new" className="btn-primary flex items-center gap-2">
+        <Link to="/invoices/new" className="btn-accent flex items-center gap-2 shadow-md">
           <PlusIcon className="w-5 h-5" />
           <span>New Invoice</span>
         </Link>
       </div>
-      
+
       <div className="card p-5">
         <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
           <div className="relative flex-1">
@@ -181,7 +181,7 @@ const InvoiceList = () => {
           <div className="flex gap-2 items-center">
             <FilterIcon className="text-surface-500 w-5 h-5" />
             <select
-              className="input max-w-[150px]"
+              className="input max-w-[150px] border-surface-200 dark:border-surface-700/50"
               value={statusFilter}
               onChange={handleStatusChange}
             >
@@ -192,17 +192,17 @@ const InvoiceList = () => {
             </select>
           </div>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-r-2 border-accent shadow-md"></div>
           </div>
         ) : (
           <>
             {error ? (
               <div className="text-center py-20">
-                <AlertCircleIcon className="mx-auto h-12 w-12 text-red-500" />
-                <h3 className="mt-4 text-lg font-medium text-red-500">Error Loading Data</h3>
+                <AlertCircleIcon className="mx-auto h-12 w-12 text-error" />
+                <h3 className="mt-4 text-lg font-medium text-error">Error Loading Data</h3>
                 <p className="mt-1 text-surface-500">{error}</p>
                 <button 
                   onClick={() => window.location.reload()}
@@ -212,10 +212,10 @@ const InvoiceList = () => {
                 </button>
               </div>
             ) : invoices.length === 0 ? (
-              <div className="text-center py-20">
-                <FilePlusIcon className="mx-auto h-12 w-12 text-surface-400" />
-                <h3 className="mt-4 text-lg font-medium">No invoices found</h3>
-                <p className="mt-1 text-surface-500">Create your first invoice or try a different search.</p>
+              <div className="text-center py-20 px-6">
+                <FilePlusIcon className="mx-auto h-16 w-16 text-surface-300 dark:text-surface-600" />
+                <h3 className="mt-6 text-xl font-semibold text-surface-700 dark:text-surface-300">No invoices found</h3>
+                <p className="mt-2 text-surface-500 dark:text-surface-400 max-w-md mx-auto mb-6">Create your first invoice or try a different search.</p>
                 <Link to="/invoices/new" className="btn-primary mt-6 inline-flex items-center">
                   <PlusIcon className="mr-2 h-5 w-5" />
                   Create Invoice
@@ -224,101 +224,101 @@ const InvoiceList = () => {
             ) : (
               <>
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-full divide-y divide-surface-200 dark:divide-surface-700">
-                    <thead>
-                      <tr>
-                        <th 
-                          className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider cursor-pointer"
+                  <table className="w-full min-w-full divide-y divide-surface-200/60 dark:divide-surface-700/40">
+                    <thead className="bg-surface-50 dark:bg-surface-800/50">
+                      <tr className="text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
+                        <th
+                          className="px-6 py-4 rounded-tl-lg cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort('invoiceNumber')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Invoice #</span>
-                            <SortIcon className="w-4 h-4" />
+                            <SortIcon className="w-4 h-4 text-surface-400" />
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider cursor-pointer"
+                          className="px-6 py-4 cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort('client')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Client</span>
-                            <SortIcon className="w-4 h-4" />
+                            <SortIcon className="w-4 h-4 text-surface-400" />
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider cursor-pointer"
+                          className="px-6 py-4 cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort('issueDate')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Issue Date</span>
-                            <SortIcon className="w-4 h-4" />
+                            <SortIcon className="w-4 h-4 text-surface-400" />
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider cursor-pointer"
+                          className="px-6 py-4 cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort('dueDate')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Due Date</span>
-                            <SortIcon className="w-4 h-4" />
+                            <SortIcon className="w-4 h-4 text-surface-400" />
                           </div>
                         </th>
                         <th 
-                          className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider cursor-pointer"
+                          className="px-6 py-4 cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort('amount')}
                         >
                           <div className="flex items-center space-x-1">
                             <span>Amount</span>
-                            <SortIcon className="w-4 h-4" />
-                          </div>
+                        <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                        <th className="px-6 py-4 text-right rounded-tr-lg whitespace-nowrap">Actions</th>
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Status</th>
                         <th className="px-4 py-3 text-right text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Actions</th>
                       </tr>
-                    </thead>
-                    <tbody className="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
-                    {invoices.map((invoice) => (
+                      <tr key={invoice.Id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors group">
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="text-sm font-medium text-surface-800 dark:text-surface-200">{invoice.invoiceNumber}</div>
                       <tr key={invoice.Id} className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors">
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium">{invoice.invoiceNumber}</div>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="text-sm text-surface-700 dark:text-surface-300">{getClientName(invoice.clientId)}</div>
                         </td> 
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm">{getClientName(invoice.clientId)}</div>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="text-sm text-surface-600 dark:text-surface-300">{format(new Date(invoice.issueDate), 'MMM dd, yyyy')}</div>
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm">{format(new Date(invoice.issueDate), 'MMM dd, yyyy')}</div>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="text-sm text-surface-600 dark:text-surface-300">{format(new Date(invoice.dueDate), 'MMM dd, yyyy')}</div>
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm">{format(new Date(invoice.dueDate), 'MMM dd, yyyy')}</div>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="text-sm font-medium text-surface-800 dark:text-surface-200">${invoice.total.toLocaleString()}</div>
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium">${invoice.total.toLocaleString()}</div>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <span className={`px-3 py-1.5 text-xs font-medium rounded-full shadow-sm ${getStatusBadge(invoice.status)}`}>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(invoice.status)}`}>
-                              {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                            </span>
+                          <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end space-x-1 opacity-80 group-hover:opacity-100">
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex justify-end space-x-2">
+                                className="text-primary hover:text-primary-dark p-2 rounded-full hover:bg-primary/10 dark:hover:bg-primary/20"
                               <Link
                               to={`/invoices/${invoice.Id}`}
                                 className="text-primary hover:text-primary-dark p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="View"
                               >
                                 <EyeIcon className="w-5 h-5" />
-                              </Link>
+                                className="text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200 p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                               <Link
                               to={`/invoices/edit/${invoice.Id}`}
                                 className="text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-200 p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                                 title="Edit"
                               >
                                 <EditIcon className="w-5 h-5" />
-                              </Link>
-                              <button
+                                className="text-surface-600 hover:text-error dark:text-surface-400 dark:hover:text-error p-2 rounded-full hover:bg-error/10 dark:hover:bg-error/20"
+
                               onClick={() => handleDelete(invoice.Id)}
                                 className="text-surface-600 hover:text-red-600 dark:text-surface-400 dark:hover:text-red-400 p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
-                                title="Delete"
+                  <div className="flex justify-between items-center pt-6 border-t border-surface-200/60 dark:border-surface-700/40 mt-6">
                               >
                                 <TrashIcon className="w-5 h-5" />
                               </button>
@@ -326,14 +326,14 @@ const InvoiceList = () => {
                           </td>
                         </tr>
                       ))}
-                    </tbody>
+                        className="p-2 rounded-lg border border-surface-200 dark:border-surface-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
                   </table>
                 </div>
                 
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex justify-between items-center pt-5 border-t border-surface-200 dark:border-surface-700 mt-5">
-                    <div className="text-sm text-surface-500 dark:text-surface-400"> 
+                        className="p-2 rounded-lg border border-surface-200 dark:border-surface-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
                       Showing page {currentPage} of {totalPages} ({totalInvoices} total results)
                     </div>
                     <div className="flex space-x-1">
