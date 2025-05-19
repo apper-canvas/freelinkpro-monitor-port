@@ -22,6 +22,9 @@ const ClientList = () => {
   const UserIcon = getIcon('User');
   const ChevronRightIcon = getIcon('ChevronRight');
   const XCircleIcon = getIcon('XCircle');
+  const MailIcon = getIcon('Mail');
+  const PhoneIcon = getIcon('Phone');
+  
 
   useEffect(() => {
     loadClients();
@@ -194,7 +197,7 @@ const ClientList = () => {
                 <div className="space-y-2 mb-4">
                   {client.email && (
                     <div className="flex items-start gap-2 text-sm">
-                      <div className="w-5 h-5 text-surface-500 mt-0.5">{getIcon('Mail')({ size: 16 })}</div>
+                      <div className="w-5 h-5 text-surface-500 mt-0.5"><MailIcon size={16} /></div>
                       <a href={`mailto:${client.email}`} className="text-surface-600 dark:text-surface-300 hover:text-primary">
                         {client.email}
                       </a>
@@ -202,7 +205,7 @@ const ClientList = () => {
                   )}
                   {client.phone && (
                     <div className="flex items-start gap-2 text-sm">
-                      <div className="w-5 h-5 text-surface-500 mt-0.5">{getIcon('Phone')({ size: 16 })}</div>
+                      <div className="w-5 h-5 text-surface-500 mt-0.5"><PhoneIcon size={16} /></div>
                       <a href={`tel:${client.phone}`} className="text-surface-600 dark:text-surface-300 hover:text-primary">
                         {client.phone}
                       </a>
