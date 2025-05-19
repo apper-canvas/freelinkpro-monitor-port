@@ -398,6 +398,8 @@ const MainFeature = ({ clients, setClients }) => {
                               Delete
                             </button>
                           </div>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
