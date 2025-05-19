@@ -134,7 +134,7 @@ const ProjectDetail = () => {
   
   // Filter expenses by category
   
-  const handleDeleteProject = () => {
+  const handleDeleteProject = async () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
         // Call API to delete the project
@@ -157,7 +157,6 @@ const ProjectDetail = () => {
     
     setProject({ ...project, tasks: updatedTasks });
     toast.success('Task status updated');
-    const updatedTasks = project.tasks.map(task =>
   const addNewTask = (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
@@ -369,13 +368,13 @@ const ProjectDetail = () => {
   }
   if (error || !project) {
     return (
+      <div>
         <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full inline-block mb-4">
           <ChevronLeftIcon className="w-8 h-8 text-red-500" />
         </div>
         <h2 className="text-xl font-semibold mb-2">
           {error || 'Project not found'}
         </h2>
-        <Link to="/projects" className="btn-primary mt-4">
       </div>
     );
   }
