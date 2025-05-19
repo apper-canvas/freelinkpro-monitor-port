@@ -18,7 +18,6 @@ const ClientForm = () => {
     company: '',
     email: '',
     phone: '',
-    address: '',
     status: 'active',
     tags: [],
     lastContact: new Date().toISOString().split('T')[0]
@@ -69,7 +68,6 @@ const ClientForm = () => {
           company: client.company,
           email: client.email,
           phone: client.phone,
-          address: client.address || '',
           status: client.status,
           tags: Array.isArray(client.tags) ? client.tags : [],
           lastContact: client.lastContact || new Date().toISOString().split('T')[0]
@@ -157,7 +155,6 @@ const ClientForm = () => {
         company: formData.company,
         email: formData.email,
         phone: formData.phone,
-        address: formData.address,
         status: formData.status,
         tags: formData.tags,
         lastContact: formData.lastContact
@@ -266,21 +263,6 @@ const ClientForm = () => {
             </div>
 
             <div className="md:col-span-2 space-y-1">
-              <label htmlFor="address" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                Address
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="input"
-                placeholder="Enter client address"
-              />
-            </div>
-
-            <div className="space-y-1">
               <label htmlFor="status" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                 Status
               </label>

@@ -14,23 +14,22 @@ export const fetchClients = async () => {
     const tableName = 'client1';
     
     // We can fetch all fields regardless of visibility
-    const params = {
+    const params = { 
       fields: [
-        'Name', 
+        'Id',
+        'Name',
         'company', 
         'email', 
         'phone', 
         'status', 
         'tags', 
-        'address',
         'lastContact',
         'Tags',
         'Owner',
         'CreatedOn',
         'CreatedBy',
         'ModifiedOn',
-        'ModifiedBy'
-      ]
+        'ModifiedBy']
     };
 
     const response = await apperClient.fetchRecords(tableName, params);
@@ -46,7 +45,6 @@ export const fetchClients = async () => {
       company: client.company || '',
       email: client.email || '',
       phone: client.phone || '',
-      status: client.status || 'active',
       address: client.address || '',
       tags: client.tags || [],
       lastContact: client.lastContact || new Date().toISOString().split('T')[0]
@@ -76,7 +74,6 @@ export const createClient = async (clientData) => {
         email: clientData.email,
         phone: clientData.phone,
         status: clientData.status,
-        address: clientData.address || '',
         tags: clientData.tags,
         lastContact: clientData.lastContact || new Date().toISOString().split('T')[0]
       }]
@@ -93,7 +90,6 @@ export const createClient = async (clientData) => {
         email: newClient.email,
         phone: newClient.phone,
         status: newClient.status,
-        address: newClient.address || '',
         tags: newClient.tags,
         lastContact: newClient.lastContact
       };
@@ -119,37 +115,29 @@ export const getClientById = async (clientId) => {
     
     const params = {
       fields: [
-        'Name', 
+        'Id',
+        'Name',
         'company', 
         'email', 
         'phone', 
         'status', 
         'tags', 
-        'address',
         'lastContact',
         'Tags',
         'Owner',
         'CreatedOn',
         'CreatedBy',
         'ModifiedOn',
-        'ModifiedBy'
-      ],
-      where: [
-        {
-          fieldName: "Id",
-          operator: "ExactMatch",
-          values: [clientId]
-        }
-      ]
+        'ModifiedBy']
     };
 
-    const response = await apperClient.fetchRecords(tableName, params);
+    const response = await apperClient.getRecordById(tableName, clientId, params);
     
-    if (!response || !response.data || response.data.length === 0) {
+    if (!response || !response.data) {
       return null;
     }
     
-    const client = response.data[0];
+    const client = response.data;
     return {
       id: client.Id,
       name: client.Name || '',
@@ -157,7 +145,6 @@ export const getClientById = async (clientId) => {
       email: client.email || '',
       phone: client.phone || '',
       status: client.status || 'active',
-      address: client.address || '',
       tags: client.tags || [],
       lastContact: client.lastContact || new Date().toISOString().split('T')[0]
     };
@@ -187,7 +174,6 @@ export const updateClient = async (clientId, clientData) => {
         email: clientData.email,
         phone: clientData.phone,
         status: clientData.status,
-        address: clientData.address || '',
         tags: clientData.tags,
         lastContact: clientData.lastContact || new Date().toISOString().split('T')[0]
       }]
@@ -204,7 +190,6 @@ export const updateClient = async (clientId, clientData) => {
         email: updatedClient.email,
         phone: updatedClient.phone,
         status: updatedClient.status,
-        address: updatedClient.address || '',
         tags: updatedClient.tags,
         lastContact: updatedClient.lastContact
       };

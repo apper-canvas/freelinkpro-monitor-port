@@ -67,8 +67,7 @@ const ClientList = () => {
       searchTerm === '' || 
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       client.phone.includes(searchTerm);
       
     const matchesStatus = 
@@ -195,14 +194,6 @@ const ClientList = () => {
                       <a href={`tel:${client.phone}`} className="text-surface-600 dark:text-surface-300 hover:text-primary">
                         {client.phone}
                       </a>
-                    </div>
-                  )}
-                  {client.address && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <div className="w-5 h-5 text-surface-500 mt-0.5">{getIcon('MapPin')({ size: 16 })}</div>
-                      <span className="text-surface-600 dark:text-surface-300">
-                        {client.address}
-                      </span>
                     </div>
                   )}
                 </div>
