@@ -18,7 +18,7 @@ const ProjectForm = () => {
   const initialFormState = {
     name: '',
     description: '',
-    clientId: null,
+    clientId: '',
     startDate: new Date().toISOString().split('T')[0],
     dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     status: 'planning',
@@ -116,12 +116,6 @@ const ProjectForm = () => {
   }, [formData, clientsList, isLoading]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Clear error for this field when user starts typing
-    if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: undefined }));
-    }
   };
 
   const handleInputChange = (e) => {
