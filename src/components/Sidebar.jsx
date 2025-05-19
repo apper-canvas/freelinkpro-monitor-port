@@ -94,18 +94,8 @@ const Sidebar = () => {
                   >
                     <item.icon className="w-5 h-5 mr-3" />
                     <span>{item.label}</span>
-              <div className="p-4 rounded-xl bg-surface-50 dark:bg-surface-700/40 border border-surface-200/60 dark:border-surface-700/40 mb-3">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-gradient-primary shadow-sm flex items-center justify-center">
-                    <UserPlusIcon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-surface-800 dark:text-surface-200">
-                      {userInfo.firstName || userInfo.email.split('@')[0]}
-                    </div>
-                    <div className="text-xs text-surface-500 dark:text-surface-400">{userInfo.email}</div>
-                  </div>
-                </div>
+                  </Link>
+                </li>
               ))}
             </ul>
           </nav>
