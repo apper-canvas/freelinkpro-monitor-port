@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import * as Icons from 'lucide-react';
 import { getIcon } from '../utils/iconUtils';
 import { fetchClients, deleteClient } from '../services/clientService';
 
