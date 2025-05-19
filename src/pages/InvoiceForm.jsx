@@ -25,7 +25,7 @@ const InvoiceForm = () => {
     issueDate: format(new Date(), 'yyyy-MM-dd'),
     dueDate: format(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
     status: 'pending',
-    items: [{ id: `new-item-${Date.now()}`, description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
+    items: [{ id: `new-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
     notes: '',
     subtotal: 0,
     tax: 0,
@@ -237,7 +237,7 @@ const InvoiceForm = () => {
     if (field === 'quantity' || field === 'rate') {
       const quantity = field === 'quantity' ? value : newItems[index].quantity;
       const rate = field === 'rate' ? value : newItems[index].rate;
-      newItems[index].amount = quantity * rate;
+      newItems[index].amount = Number(quantity) * Number(rate);
     }
     
     setFormData(prev => ({
@@ -572,7 +572,7 @@ const InvoiceForm = () => {
           
           <div className="space-y-4">
             {formData.items.map((item, index) => (
-              <div key={item.id || `item-${index}`} className="grid grid-cols-12 gap-4">
+              <div key={item.id || item.Id || `item-${index}-${Date.now()}`} className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 sm:col-span-6">
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                     Description
