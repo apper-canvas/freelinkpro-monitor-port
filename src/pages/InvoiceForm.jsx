@@ -25,7 +25,7 @@ const InvoiceForm = () => {
     issueDate: format(new Date(), 'yyyy-MM-dd'),
     dueDate: format(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
     status: 'pending',
-    items: [{ id: 'new-item-1', description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
+    items: [{ id: `new-item-${Date.now()}`, description: '', quantity: 1, rate: 0, amount: 0, invoiceId: '' }],
     notes: '',
     subtotal: 0,
     tax: 0,
@@ -252,7 +252,7 @@ const InvoiceForm = () => {
       ...prev,
       items: [...prev.items, {
         // Generate a unique temporary ID for this new item
-        id: `new-item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `new-item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         description: '', 
         quantity: 1, 
         rate: 0, 
@@ -499,7 +499,7 @@ const InvoiceForm = () => {
                 required
               >
                 <option value="">Select a client</option>
-                {clients.map(client => (
+                {clients.map((client) => (
                   <option key={client.Id} value={client.Id}>
                     {client.Name} ({client.company})
                   </option>
@@ -519,7 +519,7 @@ const InvoiceForm = () => {
                 disabled={!formData.clientId}
               >
                 <option value="">Select a project</option>
-                {filteredProjects.map(project => (
+                {filteredProjects.map((project) => (
                   <option key={project.Id} value={project.Id}>
                     {project.Name}
                   </option>
