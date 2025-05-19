@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
@@ -101,7 +101,7 @@ const ProjectList = () => {
         project.clientName.toLowerCase().includes(lowercasedTerm) ||
         project.companyName.toLowerCase().includes(lowercasedTerm) ||
         (project.category && project.category.toLowerCase().includes(lowercasedTerm)) ||
-        project.tags.some(tag => tag.toLowerCase().includes(lowercasedTerm))
+        (Array.isArray(project.tags) && project.tags.some(tag => tag.toLowerCase().includes(lowercasedTerm)))
       );
     }
     
@@ -117,7 +117,7 @@ const ProjectList = () => {
         case 'priority':
           return getPriorityWeight(b.priority) - getPriorityWeight(a.priority);
         case 'category':
-          return a.category.localeCompare(b.category);
+          return (a.category || '').localeCompare(b.category || '');
         case 'progress':
           return b.progress - a.progress;
         case 'dueDate':
